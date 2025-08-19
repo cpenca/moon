@@ -1,1 +1,53 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #0d0b29, #1a1545);
+  color: #ffd700;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+/* Floating moon */
+.moon {
+  width: 120px;
+  margin-bottom: 2rem;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Navigation container */
+nav {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Navigation buttons */
+nav a {
+  padding: 1rem 2rem;
+  border: 2px solid #ffd700;
+  border-radius: 25px;
+  background: transparent;
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+nav a:hover {
+  background: rgba(255, 215, 0, 0.15);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
 
