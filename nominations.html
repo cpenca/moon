@@ -3,34 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <title>Phase 1: Nominations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <style>
+    /* --- Mobile-friendly overrides added on top of style.css --- */
     .wizard {
-      width: 100%; max-width: 820px; margin: 2rem auto; padding: 1.25rem;
-      border: 2px solid #ffd700; border-radius: 20px;
-      box-shadow: 0 0 15px rgba(255,215,0,0.5); background: rgba(13,11,41,0.85);
+      width: 95%;
+      max-width: 820px;
+      margin: 1rem auto;
+      padding: 1rem;
+      border: 2px solid #ffd700;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(255,215,0,0.5);
+      background: rgba(13,11,41,0.85);
       text-align: left;
     }
-    .step-title { font-size: 1.25rem; margin: 0 0 0.75rem; }
+    .step-title { font-size: 1.15rem; margin: 0 0 0.75rem; }
     .q { display:flex; flex-direction:column; gap:0.5rem; margin:0.5rem 0 1rem; }
-    .q input, .q textarea { padding:0.8rem; border-radius:12px; border:1px solid #ffd700; background:transparent; color:#ffd700; }
-    .q textarea { min-height:110px; }
-    .controls { display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem; }
-    .btn {
-      padding:0.8rem 1.2rem; border:2px solid #ffd700; border-radius:22px; background:transparent;
-      color:#ffd700; font-weight:700; cursor:pointer; text-decoration:none;
-      box-shadow:0 0 8px rgba(255,215,0,0.4);
-      transition: transform .2s, box-shadow .2s, background .2s;
+    .q input, .q textarea {
+      padding: 0.9rem;
+      border-radius: 12px;
+      border: 1px solid #ffd700;
+      background: transparent;
+      color: #ffd700;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
     }
-    .btn:hover { transform:scale(1.03); box-shadow:0 0 15px rgba(255,215,0,0.8); background:rgba(255,215,0,0.12); }
-    .progress { margin:0.25rem 0 1rem; font-size:0.95rem; opacity:0.9; }
-    .success,.error { margin-top:1rem; padding:0.8rem 1rem; border-radius:12px; background:rgba(0,0,0,0.25); }
+    .q textarea { min-height: 110px; }
+    .controls { display:flex; gap:0.75rem; flex-wrap:wrap; margin-top: 1rem; }
+    .btn {
+      padding: 0.95rem 1.4rem;
+      border: 2px solid #ffd700;
+      border-radius: 22px;
+      background: transparent;
+      color: #ffd700; font-weight: 700; cursor: pointer; text-decoration: none;
+      box-shadow: 0 0 8px rgba(255,215,0,0.4);
+      transition: transform .2s, box-shadow .2s, background .2s;
+      font-size: 1rem;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:hover { transform: scale(1.03); box-shadow: 0 0 15px rgba(255,215,0,0.8); background: rgba(255,215,0,0.12); }
+    .progress { margin: 0.25rem 0 1rem; font-size: 0.95rem; opacity: 0.9; }
+    .success,.error { margin-top:1rem; padding:0.9rem 1rem; border-radius:12px; background:rgba(0,0,0,0.25); }
     .success { border:1px solid #34d399; color:#b2f5ea; }
     .error { border:1px solid #f87171; color:#fecaca; }
-    .two-col { display:grid; grid-template-columns:1fr; gap:0.75rem; }
-    @media (min-width:640px){ .two-col{ grid-template-columns:1fr 1fr; } }
-    .subtext { font-size: 0.9rem; opacity: 0.85; margin-top: -0.25rem; }
-    .hp-wrap { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; } /* honeypot */
+    .two-col { display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    /* Force single-column on small screens for better readability */
+    @media (max-width: 640px) {
+      .two-col { grid-template-columns: 1fr; }
+      .wizard { margin: 0.75rem auto; padding: 0.9rem; }
+      .step-title { font-size: 1.1rem; }
+      .btn { width: 100%; justify-content: center; }
+      .controls { gap: 0.5rem; }
+    }
+    /* Hide honeypot off-screen (still accessible to bots) */
+    .hp-wrap { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
   </style>
 </head>
 <body>
@@ -46,16 +74,16 @@
 
   <main>
     <h1>Phase 1: Nominations</h1>
-    <p>You can skip any question and return before submitting.</p>
+    <p>You can skip any question by tapping “Next”. You can also go back before submitting.</p>
 
     <div class="wizard" id="wizard">
       <div class="progress" id="progress">Step 1 of 15</div>
 
-      <!-- Question area that we replace -->
+      <!-- Question area we replace -->
       <div id="step">
         <div class="step-title">1) What is your name?</div>
         <div class="q">
-          <input id="name" type="text" placeholder="Your name (optional)">
+          <input id="name" type="text" placeholder="Your name (optional)" autocomplete="name">
           <div class="subtext">You can skip if you prefer.</div>
         </div>
       </div>
@@ -65,9 +93,8 @@
         <label>Website <input type="text" id="website" autocomplete="off"></label>
       </div>
 
-      <div class="controls">
+      <div class="controls" id="controls">
         <button class="btn" id="backBtn" type="button" onclick="goBack()">← Back</button>
-        <button class="btn" id="skipBtn" type="button" onclick="skipStep()">Skip</button>
         <button class="btn" id="nextBtn" type="button" onclick="nextStep()">Next →</button>
         <button class="btn" id="submitBtn" type="button" style="display:none;" onclick="submitForm()">Submit</button>
       </div>
@@ -105,7 +132,7 @@
         return '' +
           '<div class="step-title">1) What is your name?</div>' +
           '<div class="q">' +
-            '<input id="name" type="text" placeholder="Your name (optional)">' +
+            '<input id="name" type="text" placeholder="Your name (optional)" autocomplete="name">' +
             '<div class="subtext">You can skip if you prefer.</div>' +
           '</div>';
       }
@@ -116,7 +143,7 @@
         return '' +
           '<div class="step-title">2) What is your email address?</div>' +
           '<div class="q">' +
-            '<input id="email" type="email" placeholder="you@example.com (optional)">' +
+            '<input id="email" type="email" placeholder="you@example.com (optional)" autocomplete="email">' +
             '<div class="subtext">We’ll send you updates. You can skip.</div>' +
           '</div>';
       }
@@ -157,29 +184,23 @@
     var stepContainer = document.getElementById('step');
     var progressEl   = document.getElementById('progress');
     var backBtn      = document.getElementById('backBtn');
-    var skipBtn      = document.getElementById('skipBtn');
     var nextBtn      = document.getElementById('nextBtn');
     var submitBtn    = document.getElementById('submitBtn');
     var resultEl     = document.getElementById('result');
+    var controlsWrap = document.getElementById('controls');
 
     /* ===== RENDER / COLLECT / REFILL ===== */
     function render() {
-      try {
-        stepContainer.innerHTML = steps[i].render();
-        progressEl.textContent = 'Step ' + (i + 1) + ' of ' + steps.length;
+      stepContainer.innerHTML = steps[i].render();
+      progressEl.textContent = 'Step ' + (i + 1) + ' of ' + steps.length;
 
-        var onCaptcha = steps[i].key === 'captcha';
-        backBtn.style.visibility = (i === 0 ? 'hidden' : 'visible');
-        skipBtn.style.display    = (onCaptcha ? 'none' : 'inline-block');
-        nextBtn.style.display    = (i < steps.length - 1 ? 'inline-block' : 'none');
-        submitBtn.style.display  = (i === steps.length - 1 ? 'inline-block' : 'none');
+      var onLast = (i === steps.length - 1);
+      backBtn.style.visibility = (i === 0 ? 'hidden' : 'visible');
+      nextBtn.style.display    = (onLast ? 'none' : 'inline-block');     // Next is skip/advance
+      submitBtn.style.display  = (onLast ? 'inline-block' : 'none');     // Only on last step
 
-        resultEl.innerHTML = '';
-        refill();
-      } catch (err) {
-        console.error(err);
-        resultEl.innerHTML = '<div class="error">Error rendering: ' + String(err) + '</div>';
-      }
+      resultEl.innerHTML = '';
+      refill();
     }
 
     function collectCurrentStep(saveEmpty) {
@@ -225,96 +246,75 @@
       }
     }
 
-    /* ===== BUTTON HANDLERS (GLOBAL) ===== */
+    /* ===== BUTTON HANDLERS ===== */
     function goBack() {
-      try {
-        collectCurrentStep(true);
-        i = Math.max(0, i - 1);
-        render();
-      } catch (err) {
-        console.error(err);
-        resultEl.innerHTML = '<div class="error">Back error: ' + String(err) + '</div>';
-      }
-    }
-    function skipStep() {
-      try {
-        collectCurrentStep(true);
-        i = Math.min(steps.length - 1, i + 1);
-        render();
-      } catch (err) {
-        console.error(err);
-        resultEl.innerHTML = '<div class="error">Skip error: ' + String(err) + '</div>';
-      }
+      collectCurrentStep(true);
+      i = Math.max(0, i - 1);
+      render();
     }
     function nextStep() {
-      try {
-        collectCurrentStep(false);
-        i = Math.min(steps.length - 1, i + 1);
-        render();
-      } catch (err) {
-        console.error(err);
-        resultEl.innerHTML = '<div class="error">Next error: ' + String(err) + '</div>';
-      }
+      // Next acts as skip: record what’s there (even if empty) and advance
+      collectCurrentStep(true);
+      i = Math.min(steps.length - 1, i + 1);
+      render();
     }
     function submitForm() {
-      try {
-        collectCurrentStep(false);
-        var website = document.getElementById('website') ? document.getElementById('website').value : '';
-        var elapsedMs = Date.now() - startTime;
+      collectCurrentStep(false);
+      var website = document.getElementById('website') ? document.getElementById('website').value : '';
+      var elapsedMs = Date.now() - startTime;
 
-        // Require math answer
-        var a = window._a, b = window._b, ans = Number(state.captchaAns);
-        if (!isFinite(ans)) {
-          resultEl.innerHTML = '<div class="error">❌ Please solve the quick math check.</div>';
-          return;
-        }
-
-        var payload = {
-          website: website,
-          elapsedMs: elapsedMs,
-          captcha: { a: a, b: b, ans: ans },
-          name: state.name || '',
-          email: state.email || '',
-          months: state.months
-        };
-
-        backBtn.disabled = skipBtn.disabled = nextBtn.disabled = submitBtn.disabled = true;
-
-        fetch(FORM_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids preflight/CORS
-          body: JSON.stringify(payload),
-          mode: 'cors'
-        })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          if (data && data.ok) {
-            resultEl.innerHTML = '<div class="success">✅ Thanks! Your nominations were recorded.</div>';
-          } else {
-            throw new Error((data && data.error) || 'Unknown error');
-          }
-        })
-        .catch(function (err) {
-          console.error(err);
-          resultEl.innerHTML = '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
-        })
-        .finally(function () {
-          backBtn.disabled = skipBtn.disabled = nextBtn.disabled = submitBtn.disabled = false;
-        });
-
-      } catch (err) {
-        console.error(err);
-        resultEl.innerHTML = '<div class="error">Submit error: ' + String(err) + '</div>';
+      // Require math answer
+      var a = window._a, b = window._b, ans = Number(state.captchaAns);
+      if (!isFinite(ans)) {
+        resultEl.innerHTML = '<div class="error">❌ Please solve the quick math check.</div>';
+        return;
       }
+
+      var payload = {
+        website: website,
+        elapsedMs: elapsedMs,
+        captcha: { a: a, b: b, ans: ans },
+        name: state.name || '',
+        email: state.email || '',
+        months: state.months
+      };
+
+      // Disable buttons during submit
+      backBtn.disabled = nextBtn.disabled = submitBtn.disabled = true;
+
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids preflight/CORS
+        body: JSON.stringify(payload),
+        mode: 'cors'
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data && data.ok) {
+          // Hide question + buttons and show confirmation
+          stepContainer.innerHTML = '';
+          controlsWrap.style.display = 'none';
+          resultEl.innerHTML = '<div class="success">✅ Thanks! Your nominations were recorded.</div>';
+          progressEl.textContent = 'Done';
+        } else {
+          throw new Error((data && data.error) || 'Unknown error');
+        }
+      })
+      .catch(function (err) {
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
+      })
+      .finally(function () {
+        backBtn.disabled = nextBtn.disabled = submitBtn.disabled = false;
+      });
     }
 
-    // Expose handlers to inline onclick
+    // Expose for inline onclick
     window.goBack = goBack;
-    window.skipStep = skipStep;
     window.nextStep = nextStep;
     window.submitForm = submitForm;
 
-    // Initial render (ensures the first step is wired the same way)
+    // Initial render
     render();
   </script>
 </body>
