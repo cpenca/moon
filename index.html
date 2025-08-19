@@ -1,48 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Moon — Smoke Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root { --gold: #ffd700; --bg1:#0d0b29; --bg2:#1a1545; }
-    html,body { height:100%; margin:0; }
-    body {
-      display:flex; flex-direction:column; justify-content:center; align-items:center;
-      background: linear-gradient(180deg, var(--bg1), var(--bg2));
-      color: var(--gold); font-family: system-ui, Arial, sans-serif; text-align:center;
-    }
-    h1 { margin: 0 0 1rem; }
-    .moon {
-      width:120px; margin-bottom:2rem;
-      filter: drop-shadow(0 0 10px rgba(255,215,0,0.6));
-      animation: float 4s ease-in-out infinite;
-    }
-    @keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-15px)} 100%{transform:translateY(0)} }
-    nav { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
-    nav a {
-      display:inline-block; padding:0.9rem 1.4rem; border:2px solid var(--gold); border-radius:24px;
-      color: var(--gold); text-decoration:none; font-weight:700; box-shadow:0 0 8px rgba(255,215,0,0.4);
-      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-      background: transparent;
-    }
-    nav a:hover { transform: scale(1.05); box-shadow:0 0 15px rgba(255,215,0,0.8); background: rgba(255,215,0,0.15); }
-    main { margin-top:1.5rem; max-width:800px; padding:0 1rem; }
-    .note { opacity:.8; font-size:.95rem }
-  </style>
+  <meta charset="UTF-8">
+  <title>About</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <img class="moon" alt="Full Moon"
-       src="https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg" />
+  <!-- Moon image -->
+  <img src="moon.png" alt="Full Moon" class="moon">
+
+  <!-- Navigation buttons -->
   <nav>
-    <a href="./index.html">About</a>
-    <a href="./nominations.html">Phase 1: Nominations</a>
-    <a href="./voting.html">Phase 2: Voting</a>
+    <a href="index.html">About</a>
+    <a href="nominations.html">Phase 1: Nominations</a>
+    <a href="voting.html">Phase 2: Voting</a>
   </nav>
+
   <main>
-    <h1>You should see this.</h1>
-    <p class="note">If this appears, GitHub Pages is working. Next, wire back your external <code>style.css</code> and images.</p>
+    <h1>About</h1>
+    <p>Welcome to our project! This website walks through two phases: Nominations and Voting.</p>
   </main>
 </body>
 </html>
-
