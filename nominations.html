@@ -30,8 +30,7 @@
     .two-col { display:grid; grid-template-columns:1fr; gap:0.75rem; }
     @media (min-width:640px){ .two-col{ grid-template-columns:1fr 1fr; } }
     .subtext { font-size: 0.9rem; opacity: 0.85; margin-top: -0.25rem; }
-    /* Honeypot hidden off-screen */
-    .hp-wrap { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+    .hp-wrap { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; } /* honeypot */
   </style>
 </head>
 <body>
@@ -70,161 +69,16 @@
   </main>
 
   <script>
-    // === CONFIG ===
-    const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzeNpP7xO_6P85VUfzGpMnSfXXgkBU5ML55teNV8njQgjMxV9POBfZvgfczwATqp-TR8g/exec';
-    const startTime = Date.now(); // for human-time check
-
-    const months = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
-
-    // Steps: name, email, 12 months (name+explanation), captcha
-    const steps = [
-      { key: 'name', render: () => `
-        <div class="step-title">1) What is your name?</div>
-        <div class="q">
-          <input id="name" type="text" placeholder="Your name (optional)">
-          <div class="subtext">You can skip if you prefer.</div>
-        </div>`},
-      { key: 'email', render: () => `
-        <div class="step-title">2) What is your email address?</div>
-        <div class="q">
-          <input id="email" type="email" placeholder="you@example.com (optional)">
-          <div class="subtext">We’ll send you updates. You can skip.</div>
-        </div>`},
-      ...months.map((m, idx) => ({
-        key: `m${idx}`, month: m,
-        render: () => `
-          <div class="step-title">${idx+3}) ${m}: Suggest a name for the full moon</div>
-          <div class="two-col">
-            <div class="q"><input id="moonName" type="text" placeholder="Moon name (optional)"></div>
-            <div class="q"><textarea id="moonExplanation" placeholder="Brief, optional explanation"></textarea></div>
-          </div>
-          <div class="subtext">You can skip if you like.</div>`
-      })),
-      { key: 'captcha', render: () => {
-          window._a = Math.floor(Math.random()*8)+2; // 2..9
-          window._b = Math.floor(Math.random()*8)+2;
-          return `
-            <div class="step-title">Last step: quick human check</div>
-            <div class="q">
-              <label for="captchaAns">What is <strong>${window._a} + ${window._b}</strong>?</label>
-              <input id="captchaAns" type="number" inputmode="numeric" placeholder="Answer required to submit">
-            </div>
-            <div class="subtext">This helps prevent spam.</div>`;
-        }
-      }
-    ];
-
-    const state = {
-      name: '', email: '',
-      months: months.map(m => ({ month: m, name: '', explanation: '' })),
-      captchaAns: ''
-    };
-
-    let i = 0;
-    const stepContainer = document.getElementById('step');
-    const progressEl = document.getElementById('progress');
-    const backBtn = document.getElementById('backBtn');
-    const skipBtn = document.getElementById('skipBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const resultEl = document.getElementById('result');
-
-    function render() {
-      stepContainer.innerHTML = steps[i].render();
-      progressEl.textContent = `Step ${i+1} of ${steps.length}`;
-      backBtn.style.visibility = i === 0 ? 'hidden' : 'visible';
-      // Captcha step cannot be skipped
-      const onCaptcha = steps[i].key === 'captcha';
-      skipBtn.style.display = onCaptcha ? 'none' : 'inline-block';
-      nextBtn.style.display = i < steps.length - 1 ? 'inline-block' : 'none';
-      submitBtn.style.display = i === steps.length - 1 ? 'inline-block' : 'none';
-      resultEl.innerHTML = '';
-      refill();
-    }
-
-    function collectCurrentStep(saveEmpty=false) {
-      const s = steps[i];
-      if (s.key === 'name') {
-        const v = (document.getElementById('name')?.value || '').trim();
-        if (v || saveEmpty) state.name = v;
-      } else if (s.key === 'email') {
-        const v = (document.getElementById('email')?.value || '').trim();
-        if (v || saveEmpty) state.email = v;
-      } else if (s.month) {
-        const name = (document.getElementById('moonName')?.value || '').trim();
-        const explanation = (document.getElementById('moonExplanation')?.value || '').trim();
-        const idx = months.indexOf(s.month);
-        if (idx >= 0 && (name || explanation || saveEmpty)) {
-          state.months[idx] = { month: s.month, name, explanation };
-        }
-      } else if (s.key === 'captcha') {
-        state.captchaAns = (document.getElementById('captchaAns')?.value || '').trim();
-      }
-    }
-
-    function refill() {
-      const s = steps[i];
-      if (s.key === 'name') document.getElementById('name')?.value = state.name || '';
-      else if (s.key === 'email') document.getElementById('email')?.value = state.email || '';
-      else if (s.month) {
-        const idx = months.indexOf(s.month), rec = state.months[idx] || {};
-        const n = document.getElementById('moonName'), e = document.getElementById('moonExplanation');
-        if (n) n.value = rec.name || '';
-        if (e) e.value = rec.explanation || '';
-      } else if (s.key === 'captcha') {
-        const el = document.getElementById('captchaAns'); if (el) el.value = state.captchaAns || '';
-      }
-    }
-
-    backBtn.addEventListener('click', () => { collectCurrentStep(true); i = Math.max(0, i-1); render(); });
-    skipBtn.addEventListener('click', () => { collectCurrentStep(true); i = Math.min(steps.length-1, i+1); render(); });
-    nextBtn.addEventListener('click', () => { collectCurrentStep(false); i = Math.min(steps.length-1, i+1); render(); });
-
-    submitBtn.addEventListener('click', async () => {
-      collectCurrentStep(false);
-      const website = document.getElementById('website')?.value || ''; // honeypot
-      const elapsedMs = Date.now() - startTime;
-
-      // Require captcha answer
-      const a = window._a, b = window._b, ans = Number(state.captchaAns);
-      if (!Number.isFinite(ans)) {
-        resultEl.innerHTML = `<div class="error">❌ Please solve the quick math check.</div>`;
-        return;
-      }
-
-      const payload = {
-        website,           // honeypot (should be empty)
-        elapsedMs,         // human-time
-        captcha: { a, b, ans },
-        name: state.name || '',
-        email: state.email || '',
-        months: state.months
-      };
-
+    window.addEventListener('DOMContentLoaded', () => {
       try {
-        backBtn.disabled = skipBtn.disabled = nextBtn.disabled = submitBtn.disabled = true;
-        const res = await fetch(FORM_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids preflight/CORS
-          body: JSON.stringify(payload),
-          mode: 'cors'
-        });
-        const data = await res.json();
-        if (data.ok) {
-          resultEl.innerHTML = `<div class="success">✅ Thanks! Your nominations were recorded.</div>`;
-        } else {
-          throw new Error(data.error || 'Unknown error');
-        }
-      } catch (err) {
-        resultEl.innerHTML = `<div class="error">❌ Submission failed: ${String(err)}</div>`;
-      } finally {
-        backBtn.disabled = skipBtn.disabled = nextBtn.disabled = submitBtn.disabled = false;
-      }
-    });
+        // === CONFIG ===
+        const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzeNpP7xO_6P85VUfzGpMnSfXXgkBU5ML55teNV8njQgjMxV9POBfZvgfczwATqp-TR8g/exec';
+        const startTime = Date.now(); // for human-time check
 
-    // Init
-    render();
-  </script>
-</body>
-</html>
+        const months = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+
+        // Steps: name, email, 12 months (name+explanation), captcha
+        const steps = [
+          { key: 'name', render: () => `
+            <div class="step-title">1) What is your n
