@@ -51,7 +51,7 @@
     <div class="wizard" id="wizard">
       <div class="progress" id="progress">Step 1 of 15</div>
 
-      <!-- Pre-rendered first step so fields are visible even if JS fails -->
+      <!-- Question area that we replace -->
       <div id="step">
         <div class="step-title">1) What is your name?</div>
         <div class="q">
@@ -66,10 +66,10 @@
       </div>
 
       <div class="controls">
-        <button class="btn" id="backBtn" type="button">← Back</button>
-        <button class="btn" id="skipBtn" type="button">Skip</button>
-        <button class="btn" id="nextBtn" type="button">Next →</button>
-        <button class="btn" id="submitBtn" type="button" style="display:none;">Submit</button>
+        <button class="btn" id="backBtn" type="button" onclick="goBack()">← Back</button>
+        <button class="btn" id="skipBtn" type="button" onclick="skipStep()">Skip</button>
+        <button class="btn" id="nextBtn" type="button" onclick="nextStep()">Next →</button>
+        <button class="btn" id="submitBtn" type="button" style="display:none;" onclick="submitForm()">Submit</button>
       </div>
 
       <div id="result"></div>
@@ -81,102 +81,241 @@
   </main>
 
   <script>
-    (function () {
-      // ====== CONFIG ======
-      var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzeNpP7xO_6P85VUfzGpMnSfXXgkBU5ML55teNV8njQgjMxV9POBfZvgfczwATqp-TR8g/exec';
-      var startTime = Date.now();
+    /* ===== CONFIG ===== */
+    var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzeNpP7xO_6P85VUfzGpMnSfXXgkBU5ML55teNV8njQgjMxV9POBfZvgfczwATqp-TR8g/exec';
 
-      var months = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
+    /* ===== STATE ===== */
+    var startTime = Date.now();
+    var months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
 
-      // Build steps array without optional chaining/spread quirks
-      var steps = [];
-      steps.push({
-        key: 'name',
-        render: function () {
-          return '' +
-            '<div class="step-title">1) What is your name?</div>' +
-            '<div class="q">' +
-              '<input id="name" type="text" placeholder="Your name (optional)">' +
-              '<div class="subtext">You can skip if you prefer.</div>' +
-            '</div>';
-        }
-      });
-      steps.push({
-        key: 'email',
-        render: function () {
-          return '' +
-            '<div class="step-title">2) What is your email address?</div>' +
-            '<div class="q">' +
-              '<input id="email" type="email" placeholder="you@example.com (optional)">' +
-              '<div class="subtext">We’ll send you updates. You can skip.</div>' +
-            '</div>';
-        }
-      });
-      for (var mi = 0; mi < months.length; mi++) {
-        (function(idx){
-          steps.push({
-            key: 'm' + idx,
-            month: months[idx],
-            render: function () {
-              return '' +
-                '<div class="step-title">' + (idx + 3) + ') ' + months[idx] + ': Suggest a name for the full moon</div>' +
-                '<div class="two-col">' +
-                  '<div class="q"><input id="moonName" type="text" placeholder="Moon name (optional)"></div>' +
-                  '<div class="q"><textarea id="moonExplanation" placeholder="Brief, optional explanation"></textarea></div>' +
-                '</div>' +
-                '<div class="subtext">You can skip if you like.</div>';
-            }
-          });
-        })(mi);
+    var steps = []; // filled below
+    var state = {
+      name: '',
+      email: '',
+      months: months.map(function (m) { return { month: m, name: '', explanation: '' }; }),
+      captchaAns: ''
+    };
+    var i = 0; // current step index (0..14)
+
+    /* ===== BUILD STEPS ===== */
+    steps.push({
+      key: 'name',
+      render: function () {
+        return '' +
+          '<div class="step-title">1) What is your name?</div>' +
+          '<div class="q">' +
+            '<input id="name" type="text" placeholder="Your name (optional)">' +
+            '<div class="subtext">You can skip if you prefer.</div>' +
+          '</div>';
       }
-      steps.push({
-        key: 'captcha',
-        render: function () {
-          window._a = Math.floor(Math.random()*8)+2; // 2..9
-          window._b = Math.floor(Math.random()*8)+2;
-          return '' +
-            '<div class="step-title">Last step: quick human check</div>' +
-            '<div class="q">' +
-              '<label for="captchaAns">What is <strong>' + window._a + ' + ' + window._b + '</strong>?</label>' +
-              '<input id="captchaAns" type="number" inputmode="numeric" placeholder="Answer required to submit">' +
-            '</div>' +
-            '<div class="subtext">This helps prevent spam.</div>';
-        }
-      });
+    });
+    steps.push({
+      key: 'email',
+      render: function () {
+        return '' +
+          '<div class="step-title">2) What is your email address?</div>' +
+          '<div class="q">' +
+            '<input id="email" type="email" placeholder="you@example.com (optional)">' +
+            '<div class="subtext">We’ll send you updates. You can skip.</div>' +
+          '</div>';
+      }
+    });
+    for (var mi = 0; mi < months.length; mi++) {
+      (function(idx){
+        steps.push({
+          key: 'm' + idx,
+          month: months[idx],
+          render: function () {
+            return '' +
+              '<div class="step-title">' + (idx + 3) + ') ' + months[idx] + ': Suggest a name for the full moon</div>' +
+              '<div class="two-col">' +
+                '<div class="q"><input id="moonName" type="text" placeholder="Moon name (optional)"></div>' +
+                '<div class="q"><textarea id="moonExplanation" placeholder="Brief, optional explanation"></textarea></div>' +
+              '</div>' +
+              '<div class="subtext">You can skip if you like.</div>';
+          }
+        });
+      })(mi);
+    }
+    steps.push({
+      key: 'captcha',
+      render: function () {
+        window._a = Math.floor(Math.random()*8)+2; // 2..9
+        window._b = Math.floor(Math.random()*8)+2;
+        return '' +
+          '<div class="step-title">Last step: quick human check</div>' +
+          '<div class="q">' +
+            '<label for="captchaAns">What is <strong>' + window._a + ' + ' + window._b + '</strong>?</label>' +
+            '<input id="captchaAns" type="number" inputmode="numeric" placeholder="Answer required to submit">' +
+          '</div>' +
+          '<div class="subtext">This helps prevent spam.</div>';
+      }
+    });
 
-      var state = {
-        name: '',
-        email: '',
-        months: months.map(function (m) { return { month: m, name: '', explanation: '' }; }),
-        captchaAns: ''
-      };
+    /* ===== ELEMENTS ===== */
+    var stepContainer = document.getElementById('step');
+    var progressEl   = document.getElementById('progress');
+    var backBtn      = document.getElementById('backBtn');
+    var skipBtn      = document.getElementById('skipBtn');
+    var nextBtn      = document.getElementById('nextBtn');
+    var submitBtn    = document.getElementById('submitBtn');
+    var resultEl     = document.getElementById('result');
 
-      var i = 0;
-
-      // Grab elements
-      var stepContainer = document.getElementById('step');
-      var progressEl   = document.getElementById('progress');
-      var backBtn      = document.getElementById('backBtn');
-      var skipBtn      = document.getElementById('skipBtn');
-      var nextBtn      = document.getElementById('nextBtn');
-      var submitBtn    = document.getElementById('submitBtn');
-      var resultEl     = document.getElementById('result');
-
-      function render() {
-        // Render current step
+    /* ===== RENDER / COLLECT / REFILL ===== */
+    function render() {
+      try {
         stepContainer.innerHTML = steps[i].render();
-        // Update progress
         progressEl.textContent = 'Step ' + (i + 1) + ' of ' + steps.length;
-        // Button visibility
+
         var onCaptcha = steps[i].key === 'captcha';
         backBtn.style.visibility = (i === 0 ? 'hidden' : 'visible');
         skipBtn.style.display    = (onCaptcha ? 'none' : 'inline-block');
         nextBtn.style.display    = (i < steps.length - 1 ? 'inline-block' : 'none');
         submitBtn.style.display  = (i === steps.length - 1 ? 'inline-block' : 'none');
-        // Prefill values
-        refill();
-      }
 
-      function collectCurrentStep(saveEmpty) {
-        var s = steps
+        resultEl.innerHTML = '';
+        refill();
+      } catch (err) {
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">Error rendering: ' + String(err) + '</div>';
+      }
+    }
+
+    function collectCurrentStep(saveEmpty) {
+      var s = steps[i];
+      if (s.key === 'name') {
+        var el = document.getElementById('name');
+        var v = (el ? el.value : '').trim();
+        if (v || saveEmpty) state.name = v;
+      } else if (s.key === 'email') {
+        var el2 = document.getElementById('email');
+        var v2 = (el2 ? el2.value : '').trim();
+        if (v2 || saveEmpty) state.email = v2;
+      } else if (s.month) {
+        var n = document.getElementById('moonName');
+        var e = document.getElementById('moonExplanation');
+        var name = (n ? n.value : '').trim();
+        var explanation = (e ? e.value : '').trim();
+        var idx = months.indexOf(s.month);
+        if (idx >= 0 && (name || explanation || saveEmpty)) {
+          state.months[idx] = { month: s.month, name: name, explanation: explanation };
+        }
+      } else if (s.key === 'captcha') {
+        var c = document.getElementById('captchaAns');
+        state.captchaAns = (c ? c.value : '').trim();
+      }
+    }
+
+    function refill() {
+      var s = steps[i];
+      if (s.key === 'name') {
+        var el = document.getElementById('name'); if (el) el.value = state.name || '';
+      } else if (s.key === 'email') {
+        var el2 = document.getElementById('email'); if (el2) el2.value = state.email || '';
+      } else if (s.month) {
+        var idx = months.indexOf(s.month);
+        var rec = state.months[idx] || {};
+        var n = document.getElementById('moonName');
+        var e = document.getElementById('moonExplanation');
+        if (n) n.value = rec.name || '';
+        if (e) e.value = rec.explanation || '';
+      } else if (s.key === 'captcha') {
+        var c = document.getElementById('captchaAns'); if (c) c.value = state.captchaAns || '';
+      }
+    }
+
+    /* ===== BUTTON HANDLERS (GLOBAL) ===== */
+    function goBack() {
+      try {
+        collectCurrentStep(true);
+        i = Math.max(0, i - 1);
+        render();
+      } catch (err) {
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">Back error: ' + String(err) + '</div>';
+      }
+    }
+    function skipStep() {
+      try {
+        collectCurrentStep(true);
+        i = Math.min(steps.length - 1, i + 1);
+        render();
+      } catch (err) {
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">Skip error: ' + String(err) + '</div>';
+      }
+    }
+    function nextStep() {
+      try {
+        collectCurrentStep(false);
+        i = Math.min(steps.length - 1, i + 1);
+        render();
+      } catch (err) {
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">Next error: ' + String(err) + '</div>';
+      }
+    }
+    function submitForm() {
+      try {
+        collectCurrentStep(false);
+        var website = document.getElementById('website') ? document.getElementById('website').value : '';
+        var elapsedMs = Date.now() - startTime;
+
+        // Require math answer
+        var a = window._a, b = window._b, ans = Number(state.captchaAns);
+        if (!isFinite(ans)) {
+          resultEl.innerHTML = '<div class="error">❌ Please solve the quick math check.</div>';
+          return;
+        }
+
+        var payload = {
+          website: website,
+          elapsedMs: elapsedMs,
+          captcha: { a: a, b: b, ans: ans },
+          name: state.name || '',
+          email: state.email || '',
+          months: state.months
+        };
+
+        backBtn.disabled = skipBtn.disabled = nextBtn.disabled = submitBtn.disabled = true;
+
+        fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids preflight/CORS
+          body: JSON.stringify(payload),
+          mode: 'cors'
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data && data.ok) {
+            resultEl.innerHTML = '<div class="success">✅ Thanks! Your nominations were recorded.</div>';
+          } else {
+            throw new Error((data && data.error) || 'Unknown error');
+          }
+        })
+        .catch(function (err) {
+          console.error(err);
+          resultEl.innerHTML = '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
+        })
+        .finally(function () {
+          backBtn.disabled = skipBtn.disabled = nextBtn.disabled = submitBtn.disabled = false;
+        });
+
+      } catch (err) {
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">Submit error: ' + String(err) + '</div>';
+      }
+    }
+
+    // Expose handlers to inline onclick
+    window.goBack = goBack;
+    window.skipStep = skipStep;
+    window.nextStep = nextStep;
+    window.submitForm = submitForm;
+
+    // Initial render (ensures the first step is wired the same way)
+    render();
+  </script>
+</body>
+</html>
