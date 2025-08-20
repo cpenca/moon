@@ -7,12 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="page-about">
-  <!-- Moon -->
-  <header class="site-header">
+  <!-- Night sky + water scene -->
+  <div class="scene"></div>
+
+  <!-- Hero: moon + reflection (the CSS uses --moon-url for the reflection) -->
+  <header class="hero" style="--moon-url: url('moon.png')">
     <img src="moon.png" alt="Full Moon" class="moon" />
+    <div class="moon-reflection" aria-hidden="true"></div>
   </header>
 
-  <!-- Nav (current page hidden via aria-current="page") -->
+  <!-- Nav (current page link hidden via aria-current="page") -->
   <nav class="site-nav">
     <a href="index.html" aria-current="page">About</a>
     <a href="nominations.html">Phase 1: Nominations</a>
