@@ -93,7 +93,7 @@ html, body {
 }
 
 /* ===========================
-   HERO: moon + reflection
+   HERO: moon + lunar path
 =========================== */
 .hero {
   position: relative;
@@ -110,50 +110,77 @@ html, body {
   filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.65));
   animation: float 6s ease-in-out infinite;
 }
-
-/* Reflection (uses the same image via --moon-url) */
-.moon-reflection {
-  position: absolute;
-  top: calc(var(--horizon) + 6px);
-  left: 50%;
-  translate: -50% 0;
-  width: min(40vw, 260px);
-  height: min(18vh, 180px);
-  background-image: var(--moon-url);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center top;
-  transform: scaleY(-1);
-  opacity: 0.35;
-  filter: blur(1px) saturate(0.9);
-  /* fade out into the water */
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0));
-          mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0));
-}
-.moon-reflection::after {
-  /* gentle ripples passing over the reflection */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.06) 0 2px,
-      rgba(255,255,255,0.00) 2px 8px
-    );
-  mix-blend-mode: screen;
-  opacity: .4;
-  animation: ripple 8s ease-in-out infinite;
-}
-@keyframes ripple {
-  0%   { transform: translateY(0) }
-  50%  { transform: translateY(-8px) }
-  100% { transform: translateY(0) }
-}
 @keyframes float {
   0% { transform: translateY(0) }
   50% { transform: translateY(-12px) }
   100% { transform: translateY(0) }
+}
+
+/* === Lunar path (tapered band of light across water) ===
+   Narrow near the horizon, gradually widens toward the viewer,
+   with gentle shimmering ripples.
+*/
+.lunar-path {
+  position: absolute;
+  top: calc(var(--horizon) + 2px);
+  left: 50%;
+  translate: -50% 0;
+
+  /* overall size of the shimmering area */
+  width: min(85vw, 900px);
+  height: min(40vh, 420px);
+
+  /* taper the band: narrow at top, wider at bottom */
+  clip-path: polygon(
+    48% 0%, 52% 0%,  /* tight at the horizon */
+    68% 100%, 32% 100% /* wide near the viewer */
+  );
+
+  /* layered gradients: core glow + soft halo + ripples */
+  background:
+    /* bright core spine */
+    radial-gradient(ellipse at 50% 0%,
+      rgba(255, 240, 170, 0.55) 0%,
+      rgba(255, 240, 170, 0.35) 20%,
+      rgba(255, 240, 170, 0.10) 55%,
+      rgba(255, 240, 170, 0.00) 70%),
+    /* subtle lateral glow */
+    radial-gradient(ellipse at 50% 30%,
+      rgba(255, 220, 120, 0.18) 0%,
+      rgba(255, 220, 120, 0.06) 40%,
+      rgba(255, 220, 120, 0.00) 70%),
+    /* ripples (thin horizontal streaks that drift) */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.20) 0 2px,
+      rgba(255, 255, 255, 0.00) 2px 10px
+    );
+
+  background-blend-mode: screen, screen, normal;
+
+  /* soften edges a bit */
+  filter: blur(0.6px) saturate(1.05);
+  opacity: 0.75;
+
+  /* move the ripples slowly to feel like water */
+  animation: shimmer 10s ease-in-out infinite;
+}
+
+/* shimmer: drift the repeating gradient vertically a little,
+   and subtly skew width for a living-water feel */
+@keyframes shimmer {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+    transform: translateX(0);
+  }
+  50% {
+    background-position: 0 0, 0 0, 0 -10px;
+    transform: translateX(0.2%);
+  }
+  100% {
+    background-position: 0 0, 0 0, 0 0;
+    transform: translateX(0);
+  }
 }
 
 /* ===========================
@@ -213,7 +240,7 @@ h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); }
 p  { margin: 0 0 var(--space-2); }
 
 /* ===========================
-   NOMINATIONS FORM PAGE (reuses earlier wizard styles if you want)
+   (Optional) WIZARD STYLES if used on form page
 =========================== */
 .wizard {
   width: min(94vw, 820px);
@@ -259,18 +286,16 @@ p  { margin: 0 0 var(--space-2); }
 .btn:active { transform: scale(0.98); }
 @media (max-width: 700px) { .controls .btn { width: 100%; } }
 
-/* Two-column (name + explanation) collapses to single on phones */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
 @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
 
-/* Success / error */
 .success,.error {
   margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(0,0,0,0.25);
 }
 .success { border: 1px solid #34d399; color: #b2f5ea; }
 .error   { border: 1px solid #f87171; color: #fecaca; }
 
-/* Exit button used on standalone form page */
+/* Exit button (if you use a standalone form page) */
 .exit-btn {
   position: fixed;
   top: var(--space-2);
