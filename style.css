@@ -1,174 +1,139 @@
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(180deg, #0d0b29, #1a1545);
-  color: #ffd700;
-  font-family: Arial, sans-serif;
-  text-align: center;
+/* ===========================
+   THEME & GLOBALS
+=========================== */
+:root {
+  --bg1: #0d0b29;
+  --bg2: #1a1545;
+  --gold: #ffd700;
+
+  /* Fluid type scale for comfort on mobile & desktop */
+  --fs-base: clamp(16px, 1.6vw + 0.2rem, 18px);
+  --fs-h1: clamp(24px, 4.2vw + 0.2rem, 36px);
+  --fs-h2: clamp(18px, 3.2vw + 0.2rem, 28px);
+
+  --radius: 24px;
+  --shadow-soft: 0 0 10px rgba(255, 215, 0, 0.35);
+  --shadow-strong: 0 0 16px rgba(255, 215, 0, 0.7);
+
+  /* Spacing that scales a bit */
+  --space-1: clamp(8px, 1.2vw, 14px);
+  --space-2: clamp(12px, 2vw, 20px);
+  --space-3: clamp(18px, 3vw, 28px);
+  --space-4: clamp(24px, 4vw, 40px);
 }
 
-/* Floating moon */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  color: var(--gold);
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Keep content centered and breathable on all screens */
+.container {
+  width: min(92vw, 900px);
+  margin: var(--space-3) auto var(--space-4);
+  padding: 0 var(--space-2);
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  margin: 0 0 var(--space-2);
+}
+
+p { margin: 0 0 var(--space-2); }
+
+/* ===========================
+   MOON
+=========================== */
+.site-header {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-3);
+}
+
 .moon {
-  width: 120px;
-  margin-bottom: 2rem;
-  animation: float 4s ease-in-out infinite;
+  width: clamp(90px, 22vw, 150px);
+  height: auto;
+  margin-bottom: var(--space-2);
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+  animation: float 5s ease-in-out infinite;
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-  100% { transform: translateY(0px); }
+  0% { transform: translateY(0) }
+  50% { transform: translateY(-12px) }
+  100% { transform: translateY(0) }
 }
 
-/* Navigation container */
-nav {
+/* ===========================
+   NAV BUTTONS
+=========================== */
+.site-nav {
   display: flex;
-  gap: 2rem;
-}
-
-/* Navigation buttons */
-nav a {
-  padding: 1rem 2rem;
-  border: 2px solid #ffd700;
-  border-radius: 25px;
-  background: transparent;
-  color: #ffd700;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
-}
-
-nav a:hover {
-  background: rgba(255, 215, 0, 0.15);
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-}
-
-/* ========= Mobile-first, fluid sizing & layout tweaks ========= */
-
-/* Global type scale (comfortable on mobile, steady on desktop) */
-:root{
-  --gold: #ffd700;
-  --bg1: #0d0b29; --bg2:#1a1545;
-
-  /* Fluid base size ~16px on phones → ~18px on large screens */
-  --fs-base: clamp(16px, 1.8vw + 0.2rem, 18px);
-  /* Headings scale */
-  --fs-h1: clamp(22px, 4.2vw + 0.2rem, 36px);
-  --fs-h2: clamp(18px, 3.4vw + 0.2rem, 28px);
-  --fs-small: clamp(13px, 1.2vw + 0.2rem, 15px);
-
-  /* Spacing */
-  --space-1: clamp(8px, 1.6vw, 14px);
-  --space-2: clamp(12px, 2.4vw, 20px);
-  --space-3: clamp(16px, 3.2vw, 28px);
-  --radius: 20px;
-}
-
-html, body { font-size: var(--fs-base); line-height: 1.5; }
-
-/* Make the moon responsive and nicely sized on phones */
-.moon {
-  width: clamp(80px, 22vw, 140px);
-  margin-bottom: var(--space-2);
-  filter: drop-shadow(0 0 10px rgba(255,215,0,0.6));
-}
-
-/* Center block content and constrain width for readability */
-main {
-  width: min(92vw, 900px);
-  padding: var(--space-2);
-  margin-inline: auto;
-}
-
-h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); }
-p  { margin: 0 0 var(--space-2); }
-
-/* Nav: wrap on small screens, bigger tap targets */
-nav {
-  flex-wrap: wrap;
+  flex-direction: column;       /* stacked on mobile */
+  align-items: center;
   gap: var(--space-1);
-  justify-content: center;
-}
-nav a {
-  padding: 0.7rem 1.1rem;
-  border-radius: 24px;
-  font-size: clamp(14px, 1.8vw, 16px);
+  padding: 0 var(--space-2);
+  margin: 0 auto var(--space-3);
+  width: min(92vw, 700px);
 }
 
-/* ========== Page-specific tuning ========== */
+.site-nav a {
+  display: inline-block;
+  width: 100%;                  /* full-width buttons on mobile */
+  text-align: center;
+  padding: 0.9rem 1.2rem;
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  color: var(--gold);
+  text-decoration: none;
+  background: transparent;
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
 
-/* About page: text was too small on phones — bump it and increase line-length control */
-.page-about main {
+.site-nav a:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 215, 0, 0.12);
+  box-shadow: var(--shadow-strong);
+}
+
+/* Hide the current page button (mark link with aria-current="page" in HTML) */
+.site-nav a[aria-current="page"] {
+  display: none;
+}
+
+/* On wider screens, show nav horizontally with natural button sizing */
+@media (min-width: 720px) {
+  .site-nav {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .site-nav a {
+    width: auto;                 /* no forced full-width on desktop */
+    min-width: 210px;
+  }
+}
+
+/* ===========================
+   PAGE-SPECIFIC TUNING
+=========================== */
+
+/* About page text was too small on phones—this keeps it comfy */
+.page-about .container {
   width: min(92vw, 760px);
 }
-.page-about p, .page-about li {
-  font-size: clamp(16px, 2.6vw, 18px);
-}
 
-/* Nominations page: inputs felt too large on phones — gently reduce and relax spacing */
-.page-nominations .wizard {
-  width: min(94vw, 820px);
-  margin: var(--space-2) auto;
-  padding: clamp(12px, 2.5vw, 18px);
-  border-radius: var(--radius);
-  box-shadow: 0 0 15px rgba(255,215,0,0.5);
-  background: rgba(13,11,41,0.85);
-  text-align: left;
+/* Optional: reduce outer padding on tiny screens */
+@media (max-width: 420px) {
+  .container { padding: 0 var(--space-1); }
 }
-.page-nominations .step-title {
-  font-size: var(--fs-h2);
-  margin-bottom: var(--space-1);
-}
-.page-nominations .q input,
-.page-nominations .q textarea {
-  font-size: clamp(15px, 2.2vw, 16px); /* slightly smaller than global */
-  padding: clamp(10px, 2.2vw, 14px);
-  border-radius: 12px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.page-nominations .q textarea { min-height: 110px; }
-.page-nominations .controls { gap: var(--space-1); margin-top: var(--space-1); }
-.page-nominations .btn {
-  font-size: clamp(15px, 2.4vw, 16px);
-  padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px);
-}
-
-/* Two-column pair (name + explanation) collapses to single on phones */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-1);
-}
-@media (max-width: 700px) {
-  .two-col { grid-template-columns: 1fr; }
-  .page-nominations .btn { width: 100%; } /* easy thumb targets */
-}
-
-/* Voting page: keep message readable on phones */
-.page-voting main p {
-  font-size: clamp(16px, 2.4vw, 18px);
-}
-
-/* Gentle golden glow stays subtle on small screens */
-nav a, .page-nominations .btn {
-  box-shadow: 0 0 8px rgba(255,215,0,0.35);
-}
-nav a:hover, .page-nominations .btn:hover {
-  box-shadow: 0 0 14px rgba(255,215,0,0.7);
-}
-
-/* Reduce global outer padding on very small screens for more usable space */
-@media (max-width: 420px){
-  main { padding: var(--space-1); }
-}
-
-
