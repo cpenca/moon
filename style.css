@@ -51,3 +51,124 @@ nav a:hover {
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
 }
 
+/* ========= Mobile-first, fluid sizing & layout tweaks ========= */
+
+/* Global type scale (comfortable on mobile, steady on desktop) */
+:root{
+  --gold: #ffd700;
+  --bg1: #0d0b29; --bg2:#1a1545;
+
+  /* Fluid base size ~16px on phones → ~18px on large screens */
+  --fs-base: clamp(16px, 1.8vw + 0.2rem, 18px);
+  /* Headings scale */
+  --fs-h1: clamp(22px, 4.2vw + 0.2rem, 36px);
+  --fs-h2: clamp(18px, 3.4vw + 0.2rem, 28px);
+  --fs-small: clamp(13px, 1.2vw + 0.2rem, 15px);
+
+  /* Spacing */
+  --space-1: clamp(8px, 1.6vw, 14px);
+  --space-2: clamp(12px, 2.4vw, 20px);
+  --space-3: clamp(16px, 3.2vw, 28px);
+  --radius: 20px;
+}
+
+html, body { font-size: var(--fs-base); line-height: 1.5; }
+
+/* Make the moon responsive and nicely sized on phones */
+.moon {
+  width: clamp(80px, 22vw, 140px);
+  margin-bottom: var(--space-2);
+  filter: drop-shadow(0 0 10px rgba(255,215,0,0.6));
+}
+
+/* Center block content and constrain width for readability */
+main {
+  width: min(92vw, 900px);
+  padding: var(--space-2);
+  margin-inline: auto;
+}
+
+h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); }
+p  { margin: 0 0 var(--space-2); }
+
+/* Nav: wrap on small screens, bigger tap targets */
+nav {
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: center;
+}
+nav a {
+  padding: 0.7rem 1.1rem;
+  border-radius: 24px;
+  font-size: clamp(14px, 1.8vw, 16px);
+}
+
+/* ========== Page-specific tuning ========== */
+
+/* About page: text was too small on phones — bump it and increase line-length control */
+.page-about main {
+  width: min(92vw, 760px);
+}
+.page-about p, .page-about li {
+  font-size: clamp(16px, 2.6vw, 18px);
+}
+
+/* Nominations page: inputs felt too large on phones — gently reduce and relax spacing */
+.page-nominations .wizard {
+  width: min(94vw, 820px);
+  margin: var(--space-2) auto;
+  padding: clamp(12px, 2.5vw, 18px);
+  border-radius: var(--radius);
+  box-shadow: 0 0 15px rgba(255,215,0,0.5);
+  background: rgba(13,11,41,0.85);
+  text-align: left;
+}
+.page-nominations .step-title {
+  font-size: var(--fs-h2);
+  margin-bottom: var(--space-1);
+}
+.page-nominations .q input,
+.page-nominations .q textarea {
+  font-size: clamp(15px, 2.2vw, 16px); /* slightly smaller than global */
+  padding: clamp(10px, 2.2vw, 14px);
+  border-radius: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.page-nominations .q textarea { min-height: 110px; }
+.page-nominations .controls { gap: var(--space-1); margin-top: var(--space-1); }
+.page-nominations .btn {
+  font-size: clamp(15px, 2.4vw, 16px);
+  padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px);
+}
+
+/* Two-column pair (name + explanation) collapses to single on phones */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+}
+@media (max-width: 700px) {
+  .two-col { grid-template-columns: 1fr; }
+  .page-nominations .btn { width: 100%; } /* easy thumb targets */
+}
+
+/* Voting page: keep message readable on phones */
+.page-voting main p {
+  font-size: clamp(16px, 2.4vw, 18px);
+}
+
+/* Gentle golden glow stays subtle on small screens */
+nav a, .page-nominations .btn {
+  box-shadow: 0 0 8px rgba(255,215,0,0.35);
+}
+nav a:hover, .page-nominations .btn:hover {
+  box-shadow: 0 0 14px rgba(255,215,0,0.7);
+}
+
+/* Reduce global outer padding on very small screens for more usable space */
+@media (max-width: 420px){
+  main { padding: var(--space-1); }
+}
+
+
