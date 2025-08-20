@@ -6,7 +6,7 @@
   --bg2: #1a1545;
   --gold: #ffd700;
 
-  /* Fluid type scale for comfort on mobile & desktop */
+  /* Fluid type scale */
   --fs-base: clamp(16px, 1.6vw + 0.2rem, 18px);
   --fs-h1: clamp(24px, 4.2vw + 0.2rem, 36px);
   --fs-h2: clamp(18px, 3.2vw + 0.2rem, 28px);
@@ -15,7 +15,6 @@
   --shadow-soft: 0 0 10px rgba(255, 215, 0, 0.35);
   --shadow-strong: 0 0 16px rgba(255, 215, 0, 0.7);
 
-  /* Spacing that scales a bit */
   --space-1: clamp(8px, 1.2vw, 14px);
   --space-2: clamp(12px, 2vw, 20px);
   --space-3: clamp(18px, 3vw, 28px);
@@ -36,7 +35,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Keep content centered and breathable on all screens */
+/* Container */
 .container {
   width: min(92vw, 900px);
   margin: var(--space-3) auto var(--space-4);
@@ -112,28 +111,110 @@ p { margin: 0 0 var(--space-2); }
   display: none;
 }
 
-/* On wider screens, show nav horizontally with natural button sizing */
+/* On wider screens, show nav horizontally */
 @media (min-width: 720px) {
-  .site-nav {
-    flex-direction: row;
-    justify-content: center;
-  }
-  .site-nav a {
-    width: auto;                 /* no forced full-width on desktop */
-    min-width: 210px;
-  }
+  .site-nav { flex-direction: row; justify-content: center; }
+  .site-nav a { width: auto; min-width: 210px; }
 }
 
 /* ===========================
-   PAGE-SPECIFIC TUNING
+   CTA + UTILITIES
 =========================== */
+.cta-wrap { display: flex; justify-content: center; }
+.btn {
+  padding: 0.95rem 1.4rem;
+  border: 2px solid var(--gold);
+  border-radius: 22px;
+  background: transparent;
+  color: var(--gold);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: var(--shadow-soft);
+  transition: transform .2s, box-shadow .2s, background .2s;
+  font-size: 1rem;
+}
+.btn:hover { transform: translateY(-1px); background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
+.btn:active { transform: scale(0.98); }
+.btn.cta { min-width: 220px; }
 
-/* About page text was too small on phones—this keeps it comfy */
-.page-about .container {
-  width: min(92vw, 760px);
+/* ===========================
+   NOMINATIONS FORM PAGE (standalone)
+=========================== */
+.page-nominations-form .site-header { padding-top: var(--space-2); }
+
+/* Exit button – fixed top-left, visible on all screens */
+.exit-btn {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 10;
+  padding: 0.55rem 0.9rem;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  color: var(--gold);
+  text-decoration: none;
+  background: rgba(0,0,0,0.25);
+  box-shadow: var(--shadow-soft);
+  transition: transform .2s, box-shadow .2s, background .2s, opacity .2s;
+}
+.exit-btn:hover { background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
+@media (max-width: 420px) {
+  .exit-btn { padding: 0.5rem 0.75rem; }
 }
 
-/* Optional: reduce outer padding on tiny screens */
+/* Wizard container */
+.wizard {
+  width: min(94vw, 820px);
+  margin: var(--space-2) auto;
+  padding: clamp(12px, 2.5vw, 18px);
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  box-shadow: 0 0 15px rgba(255,215,0,0.5);
+  background: rgba(13,11,41,0.85);
+  text-align: left;
+}
+.progress { margin: 0 0 var(--space-1); font-size: 0.95rem; opacity: 0.9; }
+.step-title { font-size: var(--fs-h2); margin: 0 0 var(--space-1); }
+
+.q { display:flex; flex-direction:column; gap:0.5rem; margin:0.5rem 0 1rem; }
+.q input, .q textarea {
+  padding: clamp(10px, 2.2vw, 14px);
+  border-radius: 12px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  font-size: clamp(15px, 2.2vw, 16px);
+  width: 100%;
+}
+.q textarea { min-height: 110px; }
+.subtext { font-size: clamp(13px, 1.6vw, 14px); opacity: 0.85; margin-top: -0.2rem; }
+
+.controls { display:flex; gap: var(--space-1); flex-wrap: wrap; margin-top: var(--space-1); }
+.page-nominations-form .btn { font-size: clamp(15px, 2.4vw, 16px); padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px); }
+@media (max-width: 700px) { .page-nominations-form .btn { width: 100%; } }
+
+/* Two-column (name + explanation) collapses to single on phones */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
+@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Messages */
+.success,.error {
+  margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(0,0,0,0.25);
+}
+.success { border: 1px solid #34d399; color: #b2f5ea; }
+.error   { border: 1px solid #f87171; color: #fecaca; }
+
+/* Honeypot off-screen */
+.hp-wrap { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+/* ===========================
+   PAGE-SPECIFIC
+=========================== */
+.page-about .container { width: min(92vw, 760px); }
+.page-voting .vote-note { font-size: clamp(16px, 2.4vw, 18px); }
+
+/* Tiny screens: reduce outer padding */
 @media (max-width: 420px) {
   .container { padding: 0 var(--space-1); }
 }
