@@ -2,16 +2,13 @@
    THEME & GLOBALS
 =========================== */
 :root {
-  --bg-sky-top: #050719;        /* deep night */
-  --bg-sky-mid: #0b0f2e;        /* horizon */
-  --bg-water-top: #0b1033;      /* water near horizon */
-  --bg-water-bottom: #070a1f;   /* deeper water */
+  --bg1: #0d0b29;   /* deep purple-blue */
+  --bg2: #1a1545;   /* slightly lighter */
   --gold: #ffd700;
 
-  /* Fluid type */
   --fs-base: clamp(16px, 1.6vw + 0.2rem, 18px);
   --fs-h1: clamp(24px, 4.2vw + 0.2rem, 36px);
-  --fs-h2: clamp(18px, 3.2vw + 0.2rem, 28px);
+  --fs-h2: clamp(18px, 3.0vw + 0.2rem, 28px);
 
   --radius: 24px;
   --shadow-soft: 0 0 10px rgba(255, 215, 0, 0.35);
@@ -21,9 +18,6 @@
   --space-2: clamp(12px, 2vw, 20px);
   --space-3: clamp(18px, 3vw, 28px);
   --space-4: clamp(24px, 4vw, 40px);
-
-  /* Scene layout */
-  --horizon: 52vh; /* where sky ends & water begins */
 }
 
 * { box-sizing: border-box; }
@@ -35,152 +29,45 @@ html, body {
   font-size: var(--fs-base);
   line-height: 1.55;
   color: var(--gold);
-  background: black; /* fallback */
-  overflow-x: hidden;
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
+
+/* Keep content centered and breathable */
+.container {
+  width: min(92vw, 900px);
+  margin: var(--space-3) auto calc(var(--space-4) + 18vh); /* leave room for skyline */
+  padding: 0 var(--space-2);
+}
+
+h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); }
+p  { margin: 0 0 var(--space-2); }
 
 /* ===========================
-   SCENE: sky, stars, horizon, water
+   HERO: centered moon
 =========================== */
-.scene {
-  position: fixed;
-  inset: 0;
-  z-index: -3;
-  /* sky (top) to horizon to water (bottom) */
-  background:
-    linear-gradient(to bottom,
-      var(--bg-sky-top) 0%,
-      var(--bg-sky-mid) var(--horizon),
-      var(--bg-water-top) calc(var(--horizon) + 0.01%),
-      var(--bg-water-bottom) 100%);
-}
-
-/* stars layer */
-.scene::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background-image:
-    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.55), transparent 60%),
-    radial-gradient(1.5px 1.5px at 70% 20%, rgba(255,255,255,0.45), transparent 60%),
-    radial-gradient(1.3px 1.3px at 40% 10%, rgba(255,255,255,0.35), transparent 60%),
-    radial-gradient(1.2px 1.2px at 80% 40%, rgba(255,255,255,0.35), transparent 60%),
-    radial-gradient(1.1px 1.1px at 55% 32%, rgba(255,255,255,0.35), transparent 60%),
-    radial-gradient(1px 1px at 15% 12%, rgba(255,255,255,0.35), transparent 60%);
-  background-repeat: repeat;
-  background-size: 800px 600px, 700px 500px, 650px 450px, 750px 550px, 600px 400px, 900px 700px;
-  opacity: .5;
-  animation: starDrift 60s linear infinite;
-}
-@keyframes starDrift {
-  from { transform: translateY(0); }
-  to   { transform: translateY(10px); }
-}
-
-/* subtle horizon shimmer line */
-.scene::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0;
-  top: calc(var(--horizon) - 1px);
-  height: 2px;
-  background: radial-gradient(ellipse at center, rgba(255,255,255,0.35), transparent 60%);
-  filter: blur(1px);
-  opacity: .6;
-}
-
-/* ===========================
-   HERO: moon + lunar path
-=========================== */
-.hero {
-  position: relative;
+.site-header {
   display: grid;
   place-items: center;
-  padding-top: clamp(24px, 6vh, 80px);
-  margin-bottom: var(--space-2);
+  padding-top: var(--space-3);
 }
 
-/* Moon */
 .moon {
   width: clamp(90px, 22vw, 160px);
   height: auto;
-  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.65));
+  /* gentle glow */
+  filter:
+    drop-shadow(0 0 12px rgba(255, 215, 0, 0.55))
+    drop-shadow(0 0 28px rgba(255, 215, 0, 0.25));
+  /* gentle float */
   animation: float 6s ease-in-out infinite;
 }
 @keyframes float {
-  0% { transform: translateY(0) }
-  50% { transform: translateY(-12px) }
+  0%   { transform: translateY(0) }
+  50%  { transform: translateY(-10px) }
   100% { transform: translateY(0) }
-}
-
-/* === Lunar path (tapered band of light across water) ===
-   Narrow near the horizon, gradually widens toward the viewer,
-   with gentle shimmering ripples.
-*/
-.lunar-path {
-  position: absolute;
-  top: calc(var(--horizon) + 2px);
-  left: 50%;
-  translate: -50% 0;
-
-  /* overall size of the shimmering area */
-  width: min(85vw, 900px);
-  height: min(40vh, 420px);
-
-  /* taper the band: narrow at top, wider at bottom */
-  clip-path: polygon(
-    48% 0%, 52% 0%,  /* tight at the horizon */
-    68% 100%, 32% 100% /* wide near the viewer */
-  );
-
-  /* layered gradients: core glow + soft halo + ripples */
-  background:
-    /* bright core spine */
-    radial-gradient(ellipse at 50% 0%,
-      rgba(255, 240, 170, 0.55) 0%,
-      rgba(255, 240, 170, 0.35) 20%,
-      rgba(255, 240, 170, 0.10) 55%,
-      rgba(255, 240, 170, 0.00) 70%),
-    /* subtle lateral glow */
-    radial-gradient(ellipse at 50% 30%,
-      rgba(255, 220, 120, 0.18) 0%,
-      rgba(255, 220, 120, 0.06) 40%,
-      rgba(255, 220, 120, 0.00) 70%),
-    /* ripples (thin horizontal streaks that drift) */
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.20) 0 2px,
-      rgba(255, 255, 255, 0.00) 2px 10px
-    );
-
-  background-blend-mode: screen, screen, normal;
-
-  /* soften edges a bit */
-  filter: blur(0.6px) saturate(1.05);
-  opacity: 0.75;
-
-  /* move the ripples slowly to feel like water */
-  animation: shimmer 10s ease-in-out infinite;
-}
-
-/* shimmer: drift the repeating gradient vertically a little,
-   and subtly skew width for a living-water feel */
-@keyframes shimmer {
-  0% {
-    background-position: 0 0, 0 0, 0 0;
-    transform: translateX(0);
-  }
-  50% {
-    background-position: 0 0, 0 0, 0 -10px;
-    transform: translateX(0.2%);
-  }
-  100% {
-    background-position: 0 0, 0 0, 0 0;
-    transform: translateX(0);
-  }
 }
 
 /* ===========================
@@ -188,59 +75,101 @@ html, body {
 =========================== */
 .site-nav {
   display: flex;
-  flex-direction: column;       /* stacked on mobile */
+  flex-direction: column;
   align-items: center;
   gap: var(--space-1);
   padding: 0 var(--space-2);
   margin: 0 auto var(--space-3);
   width: min(92vw, 700px);
-  position: relative;
-  z-index: 1; /* keep above water shimmer */
 }
 
 .site-nav a {
   display: inline-block;
-  width: 100%;                  /* full-width buttons on mobile */
+  width: 100%;           /* full-width on mobile */
   text-align: center;
   padding: 0.9rem 1.2rem;
   border: 2px solid var(--gold);
   border-radius: var(--radius);
   color: var(--gold);
   text-decoration: none;
-  background: rgba(0,0,0,0.1);
+  background: transparent;
   font-weight: 700;
   box-shadow: var(--shadow-soft);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+  transition: transform .2s, box-shadow .2s, background .2s, opacity .2s;
 }
 .site-nav a:hover {
   transform: translateY(-1px);
   background: rgba(255, 215, 0, 0.12);
   box-shadow: var(--shadow-strong);
 }
-/* Hide the current page button (mark link with aria-current="page" in HTML) */
+/* Hide current page button (add aria-current="page" in HTML) */
 .site-nav a[aria-current="page"] { display: none; }
 
-/* Desktop row */
 @media (min-width: 720px) {
   .site-nav { flex-direction: row; justify-content: center; }
   .site-nav a { width: auto; min-width: 210px; }
 }
 
 /* ===========================
-   CONTENT
+   CTA + UTILITIES
 =========================== */
-.container {
-  width: min(92vw, 900px);
-  margin: var(--space-3) auto var(--space-4);
-  padding: 0 var(--space-2);
-  position: relative;
-  z-index: 1;
+.cta-wrap { display: flex; justify-content: center; }
+.btn {
+  padding: 0.95rem 1.4rem;
+  border: 2px solid var(--gold);
+  border-radius: 22px;
+  background: transparent;
+  color: var(--gold);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: var(--shadow-soft);
+  transition: transform .2s, box-shadow .2s, background .2s;
+  font-size: 1rem;
 }
-h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); }
-p  { margin: 0 0 var(--space-2); }
+.btn:hover { transform: translateY(-1px); background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
+.btn:active { transform: scale(0.98); }
+.btn.cta { min-width: 220px; }
 
 /* ===========================
-   (Optional) WIZARD STYLES if used on form page
+   SKYLINE FOOTER (persistent at bottom)
+=========================== */
+.skyline-footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: clamp(120px, 18vh, 220px);
+  z-index: 0; /* behind main content */
+  overflow: hidden;
+}
+.skyline-footer::before {
+  /* top fade so skyline blends into page */
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(13,11,41,0.0), rgba(13,11,41,0.5));
+  z-index: 1;
+  pointer-events: none;
+}
+.skyline-footer img {
+  position: absolute;
+  left: 50%; bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* nicely crops the 2550x1066 image */
+  filter: saturate(0.95) brightness(0.9);
+  opacity: 0.9;
+  z-index: 0;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Raise content above skyline */
+main, .site-header, .site-nav { position: relative; z-index: 2; }
+
+/* ===========================
+   NOMINATIONS — standalone form page
 =========================== */
 .wizard {
   width: min(94vw, 820px);
@@ -269,22 +198,8 @@ p  { margin: 0 0 var(--space-2); }
 .subtext { font-size: clamp(13px, 1.6vw, 14px); opacity: 0.85; margin-top: -0.2rem; }
 
 .controls { display:flex; gap: var(--space-1); flex-wrap: wrap; margin-top: var(--space-1); }
-.btn {
-  padding: 0.95rem 1.4rem;
-  border: 2px solid var(--gold);
-  border-radius: 22px;
-  background: rgba(0,0,0,0.1);
-  color: var(--gold);
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: var(--shadow-soft);
-  transition: transform .2s, box-shadow .2s, background .2s;
-  font-size: 1rem;
-}
-.btn:hover { transform: translateY(-1px); background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
-.btn:active { transform: scale(0.98); }
-@media (max-width: 700px) { .controls .btn { width: 100%; } }
+.page-nominations-form .btn { font-size: clamp(15px, 2.4vw, 16px); padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px); }
+@media (max-width: 700px) { .page-nominations-form .btn { width: 100%; } }
 
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
 @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
@@ -295,7 +210,7 @@ p  { margin: 0 0 var(--space-2); }
 .success { border: 1px solid #34d399; color: #b2f5ea; }
 .error   { border: 1px solid #f87171; color: #fecaca; }
 
-/* Exit button (if you use a standalone form page) */
+/* Exit button for standalone form page */
 .exit-btn {
   position: fixed;
   top: var(--space-2);
@@ -311,6 +226,4 @@ p  { margin: 0 0 var(--space-2); }
   transition: transform .2s, box-shadow .2s, background .2s, opacity .2s;
 }
 .exit-btn:hover { background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
-@media (max-width: 420px) {
-  .exit-btn { padding: 0.5rem 0.75rem; }
-}
+@media (max-width: 420px) { .exit-btn { padding: 0.5rem 0.75rem; } }
