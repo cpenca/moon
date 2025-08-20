@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>About</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="page-about">
+  <!-- Moon -->
+  <header class="site-header">
+    <img src="moon.png" alt="Full Moon" class="moon" />
+  </header>
 
-<body>
-  <!-- Moon image -->
-  <img src="moon2.png" alt="Full Moon" class="moon">
-
-  <!-- Navigation buttons -->
-  <nav>
-    <a href="index.html">About</a>
+  <!-- Nav (current page link has aria-current="page" and will be hidden by CSS) -->
+  <nav class="site-nav">
+    <a href="index.html" aria-current="page">About</a>
     <a href="nominations.html">Phase 1: Nominations</a>
     <a href="voting.html">Phase 2: Voting</a>
   </nav>
 
-  <main>
-    <h1>About</h1>
-    <p>Our aim is simple, let us give names to the full moons of Miami.</p>
-    <p>The names used by the rest of the country are culturally, climatically and ecologically ill suited for Miami</p>
-    <p>What does a "corn moon" mean to us? A "beaver moon"? </p>
-    <p>The full moon is associated with madness and with romance. Is there a more mad, more romantic city than Miami?</p>
-    <p>Lets plumb the depths of our incredible variety of culture, of nature, of life itself, and bequeth names to our full moons that hold meaning and capture our city's spirit</p>
+  <!-- Content -->
+  <main class="container">
+    <h1>About this Project</h1>
+    <p>
+      Help us nickname each month’s full moon. In <strong>Phase 1</strong>, you can suggest names for
+      all twelve months (and add a short explanation if you’d like). In <strong>Phase 2</strong>, we’ll
+      open up voting to pick the favorites.
+    </p>
+    <p>
+      Use the buttons above to jump to <em>Phase 1: Nominations</em> or check back for
+      <em>Phase 2: Voting</em> once nominations wrap.
+    </p>
   </main>
 </body>
 </html>
