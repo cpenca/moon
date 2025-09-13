@@ -227,3 +227,22 @@ main, .site-header, .site-nav { position: relative; z-index: 2; }
 }
 .exit-btn:hover { background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
 @media (max-width: 420px) { .exit-btn { padding: 0.5rem 0.75rem; } }
+
+/* Honeypot: visually hidden but present in DOM (better than display:none) */
+.hp-wrap{
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;  /* legacy clipping */
+  clip-path: inset(50%) !important; /* modern clipping */
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.hp-wrap input{
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
