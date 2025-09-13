@@ -1,19 +1,28 @@
 /* ===========================
-   THEME & GLOBALS
+   NIGHT SKY THEME (warm dusk → deep night)
 =========================== */
 :root {
-  --bg1: #0d0b29;   /* deep purple-blue */
-  --bg2: #1a1545;   /* slightly lighter */
-  --gold: #ffd700;
+  /* Palette */
+  --night-1: #080a26;   /* deepest navy */
+  --night-2: #0c0e2f;   /* dark indigo */
+  --night-3: #16143f;   /* blue-purple */
+  --dusk-warm: #ffb7a1; /* faint orange-pink glow at the bottom */
 
+  /* Text & accents */
+  --moon-yellow: #ffe89a;    /* lighter, creamy yellow for text */
+  --moon-yellow-soft: #fff2be;
+
+  /* Type scale */
   --fs-base: clamp(16px, 1.6vw + 0.2rem, 18px);
   --fs-h1: clamp(24px, 4.2vw + 0.2rem, 36px);
   --fs-h2: clamp(18px, 3.0vw + 0.2rem, 28px);
 
+  /* UI */
   --radius: 24px;
-  --shadow-soft: 0 0 10px rgba(255, 215, 0, 0.35);
-  --shadow-strong: 0 0 16px rgba(255, 215, 0, 0.7);
+  --shadow-soft: 0 0 10px rgba(255, 232, 154, 0.35);
+  --shadow-strong: 0 0 16px rgba(255, 242, 190, 0.7);
 
+  /* Spacing */
   --space-1: clamp(8px, 1.2vw, 14px);
   --space-2: clamp(12px, 2vw, 20px);
   --space-3: clamp(18px, 3vw, 28px);
@@ -28,21 +37,30 @@ html, body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-size: var(--fs-base);
   line-height: 1.55;
-  color: var(--gold);
-  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  color: var(--moon-yellow);
+  background:
+    radial-gradient(1200px 600px at 50% 110%, rgba(255, 230, 180, 0.08), rgba(255,230,180,0) 60%),
+    linear-gradient(
+      to top,
+      rgba(255, 183, 161, 0.22) 0%,
+      rgba(255, 183, 161, 0.12) 12%,
+      var(--night-3) 38%,
+      var(--night-2) 70%,
+      var(--night-1) 100%
+    );
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-/* Keep content centered and breathable */
+/* Content container */
 .container {
   width: min(92vw, 900px);
-  margin: var(--space-3) auto calc(var(--space-4) + 18vh); /* leave room for skyline */
+  margin: var(--space-3) auto var(--space-4);
   padding: 0 var(--space-2);
 }
 
-h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); }
+h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); color: var(--moon-yellow-soft); }
 p  { margin: 0 0 var(--space-2); }
 
 /* ===========================
@@ -57,13 +75,13 @@ p  { margin: 0 0 var(--space-2); }
 .moon {
   width: clamp(90px, 22vw, 160px);
   height: auto;
-  /* gentle glow */
+  /* gentle, trendy glow */
   filter:
-    drop-shadow(0 0 12px rgba(255, 215, 0, 0.55))
-    drop-shadow(0 0 28px rgba(255, 215, 0, 0.25));
-  /* gentle float */
+    drop-shadow(0 0 12px rgba(255, 242, 190, 0.55))
+    drop-shadow(0 0 28px rgba(255, 242, 190, 0.28));
   animation: float 6s ease-in-out infinite;
 }
+
 @keyframes float {
   0%   { transform: translateY(0) }
   50%  { transform: translateY(-10px) }
@@ -88,21 +106,21 @@ p  { margin: 0 0 var(--space-2); }
   width: 100%;           /* full-width on mobile */
   text-align: center;
   padding: 0.9rem 1.2rem;
-  border: 2px solid var(--gold);
+  border: 2px solid var(--moon-yellow);
   border-radius: var(--radius);
-  color: var(--gold);
+  color: var(--moon-yellow);
   text-decoration: none;
-  background: transparent;
+  background: rgba(255,255,255,0.02);
   font-weight: 700;
   box-shadow: var(--shadow-soft);
   transition: transform .2s, box-shadow .2s, background .2s, opacity .2s;
 }
 .site-nav a:hover {
   transform: translateY(-1px);
-  background: rgba(255, 215, 0, 0.12);
+  background: rgba(255, 242, 190, 0.12);
   box-shadow: var(--shadow-strong);
 }
-/* Hide current page button (add aria-current="page" in HTML) */
+/* Hide current page button (mark link with aria-current="page" in HTML) */
 .site-nav a[aria-current="page"] { display: none; }
 
 @media (min-width: 720px) {
@@ -114,12 +132,13 @@ p  { margin: 0 0 var(--space-2); }
    CTA + UTILITIES
 =========================== */
 .cta-wrap { display: flex; justify-content: center; }
+
 .btn {
   padding: 0.95rem 1.4rem;
-  border: 2px solid var(--gold);
+  border: 2px solid var(--moon-yellow);
   border-radius: 22px;
-  background: transparent;
-  color: var(--gold);
+  background: rgba(255,255,255,0.02);
+  color: var(--moon-yellow);
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
@@ -127,70 +146,34 @@ p  { margin: 0 0 var(--space-2); }
   transition: transform .2s, box-shadow .2s, background .2s;
   font-size: 1rem;
 }
-.btn:hover { transform: translateY(-1px); background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
+.btn:hover { transform: translateY(-1px); background: rgba(255,242,190,0.12); box-shadow: var(--shadow-strong); }
 .btn:active { transform: scale(0.98); }
 .btn.cta { min-width: 220px; }
 
 /* ===========================
-   SKYLINE FOOTER (persistent at bottom)
-=========================== */
-.skyline-footer {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  height: clamp(120px, 18vh, 220px);
-  z-index: 0; /* behind main content */
-  overflow: hidden;
-}
-.skyline-footer::before {
-  /* top fade so skyline blends into page */
-  content: "";
-  position: absolute;
-  left: 0; right: 0; top: 0;
-  height: 40%;
-  background: linear-gradient(to bottom, rgba(13,11,41,0.0), rgba(13,11,41,0.5));
-  z-index: 1;
-  pointer-events: none;
-}
-.skyline-footer img {
-  position: absolute;
-  left: 50%; bottom: 0;
-  transform: translateX(-50%);
-  width: 100%;
-  height: 100%;
-  object-fit: cover;  /* nicely crops the 2550x1066 image */
-  filter: saturate(0.95) brightness(0.9);
-  opacity: 0.9;
-  z-index: 0;
-  user-select: none;
-  pointer-events: none;
-}
-
-/* Raise content above skyline */
-main, .site-header, .site-nav { position: relative; z-index: 2; }
-
-/* ===========================
-   NOMINATIONS — standalone form page
+   WIZARD (nominations-form.html)
 =========================== */
 .wizard {
   width: min(94vw, 820px);
   margin: var(--space-2) auto;
   padding: clamp(12px, 2.5vw, 18px);
-  border: 2px solid var(--gold);
+  border: 2px solid var(--moon-yellow);
   border-radius: var(--radius);
-  box-shadow: 0 0 15px rgba(255,215,0,0.5);
-  background: rgba(13,11,41,0.85);
+  box-shadow: 0 0 15px rgba(255,242,190,0.45);
+  background: rgba(10, 12, 32, 0.75);
+  backdrop-filter: blur(2px);
   text-align: left;
 }
 .progress { margin: 0 0 var(--space-1); font-size: 0.95rem; opacity: 0.9; }
-.step-title { font-size: var(--fs-h2); margin: 0 0 var(--space-1); }
+.step-title { font-size: var(--fs-h2); margin: 0 0 var(--space-1); color: var(--moon-yellow-soft); }
 
 .q { display:flex; flex-direction:column; gap:0.5rem; margin:0.5rem 0 1rem; }
 .q input, .q textarea {
   padding: clamp(10px, 2.2vw, 14px);
   border-radius: 12px;
-  border: 1px solid var(--gold);
-  background: transparent;
-  color: var(--gold);
+  border: 1px solid var(--moon-yellow);
+  background: rgba(255,255,255,0.02);
+  color: var(--moon-yellow);
   font-size: clamp(15px, 2.2vw, 16px);
   width: 100%;
 }
@@ -198,37 +181,44 @@ main, .site-header, .site-nav { position: relative; z-index: 2; }
 .subtext { font-size: clamp(13px, 1.6vw, 14px); opacity: 0.85; margin-top: -0.2rem; }
 
 .controls { display:flex; gap: var(--space-1); flex-wrap: wrap; margin-top: var(--space-1); }
-.page-nominations-form .btn { font-size: clamp(15px, 2.4vw, 16px); padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px); }
+.page-nominations-form .btn {
+  font-size: clamp(15px, 2.4vw, 16px);
+  padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px);
+}
 @media (max-width: 700px) { .page-nominations-form .btn { width: 100%; } }
 
+/* Two-column (name + explanation) collapses to single on phones */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
 @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
 
+/* Messages */
 .success,.error {
   margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(0,0,0,0.25);
 }
 .success { border: 1px solid #34d399; color: #b2f5ea; }
 .error   { border: 1px solid #f87171; color: #fecaca; }
 
-/* Exit button for standalone form page */
+/* Exit button (if used) */
 .exit-btn {
   position: fixed;
   top: var(--space-2);
   left: var(--space-2);
   z-index: 10;
   padding: 0.55rem 0.9rem;
-  border: 2px solid var(--gold);
+  border: 2px solid var(--moon-yellow);
   border-radius: 14px;
-  color: var(--gold);
+  color: var(--moon-yellow);
   text-decoration: none;
   background: rgba(0,0,0,0.25);
   box-shadow: var(--shadow-soft);
   transition: transform .2s, box-shadow .2s, background .2s, opacity .2s;
 }
-.exit-btn:hover { background: rgba(255,215,0,0.12); box-shadow: var(--shadow-strong); }
+.exit-btn:hover { background: rgba(255,242,190,0.12); box-shadow: var(--shadow-strong); }
 @media (max-width: 420px) { .exit-btn { padding: 0.5rem 0.75rem; } }
 
-/* Honeypot: visually hidden but present in DOM (better than display:none) */
+/* ===========================
+   HONEYPOT (fully invisible to users)
+=========================== */
 .hp-wrap{
   position: absolute !important;
   width: 1px !important;
@@ -236,8 +226,8 @@ main, .site-header, .site-nav { position: relative; z-index: 2; }
   padding: 0 !important;
   margin: -1px !important;
   overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;  /* legacy clipping */
-  clip-path: inset(50%) !important; /* modern clipping */
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
   white-space: nowrap !important;
   border: 0 !important;
 }
@@ -245,4 +235,3 @@ main, .site-header, .site-nav { position: relative; z-index: 2; }
   opacity: 0 !important;
   pointer-events: none !important;
 }
-
