@@ -30,20 +30,19 @@
           <div class="subtext">You can skip if you prefer.</div>
         </div>
       </div>
+<!-- Honeypot (bots will fill; humans won’t see it) -->
+<div class="hp-wrap" aria-hidden="true">
+  <label>Website
+    <input type="text"
+           id="website"
+           name="website"
+           autocomplete="off"
+           tabindex="-1"
+           inputmode="text"
+           spellcheck="false">
+  </label>
+</div>
 
-      <!-- Honeypot (bots will fill; humans won't see it) -->
-      <div class="hp-wrap">
-        <label>Website <input type="text" id="website" autocomplete="off" /></label>
-      </div>
-
-      <div class="controls" id="controls">
-        <button class="btn" id="backBtn" type="button" onclick="goBack()">← Back</button>
-        <button class="btn" id="nextBtn" type="button" onclick="nextStep()">Next →</button>
-        <button class="btn" id="submitBtn" type="button" style="display:none;" onclick="submitForm()">Submit</button>
-      </div>
-
-      <div id="result"></div>
-    </div>
   </main>
 
   <script>
