@@ -39,7 +39,7 @@ html, body {
   line-height: 1.55;
   color: var(--moon-yellow);
   background:
-    radial-gradient(1400px 700px at 50% 115%, rgba(255, 180, 180, 0.18), rgba(255,180,180,0) 65%),
+    radial-gradient(1400px 700px at 30% 115%, rgba(255, 180, 180, 0.18), rgba(255,180,180,0) 65%),
     linear-gradient(
       to top,
       rgba(255, 120, 80, 0.55) 0%,   /* strong orange at very bottom */
