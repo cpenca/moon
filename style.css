@@ -1,28 +1,19 @@
-/* ===========================
-   NIGHT SKY THEME (warm dusk → deep night)
-=========================== */
 :root {
   /* Palette */
   --night-1: #080a26;   /* deepest navy */
   --night-2: #0c0e2f;   /* dark indigo */
   --night-3: #16143f;   /* blue-purple */
-  --dusk-warm: #ffb7a1; /* faint orange-pink glow at the bottom */
+  --moon-yellow: #ffe89a;    /* lighter creamy yellow */
+  --moon-yellow-soft: #fff7c7;
 
-  /* Text & accents */
-  --moon-yellow: #ffe89a;    /* lighter, creamy yellow for text */
-  --moon-yellow-soft: #fff2be;
-
-  /* Type scale */
   --fs-base: clamp(16px, 1.6vw + 0.2rem, 18px);
   --fs-h1: clamp(24px, 4.2vw + 0.2rem, 36px);
   --fs-h2: clamp(18px, 3.0vw + 0.2rem, 28px);
 
-  /* UI */
   --radius: 24px;
   --shadow-soft: 0 0 10px rgba(255, 232, 154, 0.35);
   --shadow-strong: 0 0 16px rgba(255, 242, 190, 0.7);
 
-  /* Spacing */
   --space-1: clamp(8px, 1.2vw, 14px);
   --space-2: clamp(12px, 2vw, 20px);
   --space-3: clamp(18px, 3vw, 28px);
@@ -39,13 +30,13 @@ html, body {
   line-height: 1.55;
   color: var(--moon-yellow);
   background:
-    radial-gradient(1400px 700px at 30% 115%, rgba(255, 180, 180, 0.18), rgba(255,180,180,0) 65%),
+    radial-gradient(1400px 700px at 50% 115%, rgba(255, 150, 150, 0.15), rgba(255,150,150,0) 65%),
     linear-gradient(
       to top,
-      rgba(255, 120, 80, 0.55) 0%,   /* strong orange at very bottom */
-      rgba(255, 95, 120, 0.48) 8%,   /* vibrant pink/orange */
-      rgba(220, 80, 160, 0.30) 18%,  /* magenta tones */
-      rgba(140, 90, 200, 0.25) 32%,  /* violet-purple */
+      rgba(220, 90, 60, 0.55) 0%,   /* deeper orange bottom */
+      rgba(230, 80, 120, 0.45) 10%, /* strong pink */
+      rgba(190, 70, 150, 0.35) 20%, /* magenta */
+      rgba(120, 80, 170, 0.30) 32%, /* violet-purple */
       var(--night-3) 50%,
       var(--night-2) 75%,
       var(--night-1) 100%
@@ -55,44 +46,45 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Content container */
+/* ===== Text Enhancements ===== */
+h1, h2, p, a, .btn, .site-nav a {
+  text-shadow:
+    0 0 6px rgba(0,0,0,0.65),
+    0 0 12px rgba(0,0,0,0.5);
+}
+h1 { color: var(--moon-yellow-soft); }
+
+/* ===== Content container (semi-transparent panel) ===== */
 .container {
   width: min(92vw, 900px);
   margin: var(--space-3) auto var(--space-4);
-  padding: 0 var(--space-2);
+  padding: var(--space-2);
+  background: rgba(0,0,0,0.35);
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
 }
 
-h1 { font-size: var(--fs-h1); margin: 0 0 var(--space-2); color: var(--moon-yellow-soft); }
-p  { margin: 0 0 var(--space-2); }
-
-/* ===========================
-   HERO: centered moon
-=========================== */
+/* ===== Hero (moon) ===== */
 .site-header {
   display: grid;
   place-items: center;
   padding-top: var(--space-3);
 }
-
 .moon {
   width: clamp(90px, 22vw, 160px);
   height: auto;
-  /* gentle, trendy glow */
   filter:
     drop-shadow(0 0 12px rgba(255, 242, 190, 0.55))
     drop-shadow(0 0 28px rgba(255, 242, 190, 0.28));
   animation: float 6s ease-in-out infinite;
 }
-
 @keyframes float {
   0%   { transform: translateY(0) }
   50%  { transform: translateY(-10px) }
   100% { transform: translateY(0) }
 }
 
-/* ===========================
-   NAV BUTTONS
-=========================== */
+/* ===== Nav buttons ===== */
 .site-nav {
   display: flex;
   flex-direction: column;
@@ -102,10 +94,9 @@ p  { margin: 0 0 var(--space-2); }
   margin: 0 auto var(--space-3);
   width: min(92vw, 700px);
 }
-
 .site-nav a {
   display: inline-block;
-  width: 100%;           /* full-width on mobile */
+  width: 100%;
   text-align: center;
   padding: 0.9rem 1.2rem;
   border: 2px solid var(--moon-yellow);
@@ -122,19 +113,13 @@ p  { margin: 0 0 var(--space-2); }
   background: rgba(255, 242, 190, 0.12);
   box-shadow: var(--shadow-strong);
 }
-/* Hide current page button (mark link with aria-current="page" in HTML) */
 .site-nav a[aria-current="page"] { display: none; }
-
 @media (min-width: 720px) {
   .site-nav { flex-direction: row; justify-content: center; }
   .site-nav a { width: auto; min-width: 210px; }
 }
 
-/* ===========================
-   CTA + UTILITIES
-=========================== */
-.cta-wrap { display: flex; justify-content: center; }
-
+/* ===== Buttons general ===== */
 .btn {
   padding: 0.95rem 1.4rem;
   border: 2px solid var(--moon-yellow);
@@ -150,90 +135,3 @@ p  { margin: 0 0 var(--space-2); }
 }
 .btn:hover { transform: translateY(-1px); background: rgba(255,242,190,0.12); box-shadow: var(--shadow-strong); }
 .btn:active { transform: scale(0.98); }
-.btn.cta { min-width: 220px; }
-
-/* ===========================
-   WIZARD (nominations-form.html)
-=========================== */
-.wizard {
-  width: min(94vw, 820px);
-  margin: var(--space-2) auto;
-  padding: clamp(12px, 2.5vw, 18px);
-  border: 2px solid var(--moon-yellow);
-  border-radius: var(--radius);
-  box-shadow: 0 0 15px rgba(255,242,190,0.45);
-  background: rgba(10, 12, 32, 0.75);
-  backdrop-filter: blur(2px);
-  text-align: left;
-}
-.progress { margin: 0 0 var(--space-1); font-size: 0.95rem; opacity: 0.9; }
-.step-title { font-size: var(--fs-h2); margin: 0 0 var(--space-1); color: var(--moon-yellow-soft); }
-
-.q { display:flex; flex-direction:column; gap:0.5rem; margin:0.5rem 0 1rem; }
-.q input, .q textarea {
-  padding: clamp(10px, 2.2vw, 14px);
-  border-radius: 12px;
-  border: 1px solid var(--moon-yellow);
-  background: rgba(255,255,255,0.02);
-  color: var(--moon-yellow);
-  font-size: clamp(15px, 2.2vw, 16px);
-  width: 100%;
-}
-.q textarea { min-height: 110px; }
-.subtext { font-size: clamp(13px, 1.6vw, 14px); opacity: 0.85; margin-top: -0.2rem; }
-
-.controls { display:flex; gap: var(--space-1); flex-wrap: wrap; margin-top: var(--space-1); }
-.page-nominations-form .btn {
-  font-size: clamp(15px, 2.4vw, 16px);
-  padding: clamp(10px, 2.2vw, 14px) clamp(14px, 3.2vw, 18px);
-}
-@media (max-width: 700px) { .page-nominations-form .btn { width: 100%; } }
-
-/* Two-column (name + explanation) collapses to single on phones */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
-@media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
-
-/* Messages */
-.success,.error {
-  margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(0,0,0,0.25);
-}
-.success { border: 1px solid #34d399; color: #b2f5ea; }
-.error   { border: 1px solid #f87171; color: #fecaca; }
-
-/* Exit button (if used) */
-.exit-btn {
-  position: fixed;
-  top: var(--space-2);
-  left: var(--space-2);
-  z-index: 10;
-  padding: 0.55rem 0.9rem;
-  border: 2px solid var(--moon-yellow);
-  border-radius: 14px;
-  color: var(--moon-yellow);
-  text-decoration: none;
-  background: rgba(0,0,0,0.25);
-  box-shadow: var(--shadow-soft);
-  transition: transform .2s, box-shadow .2s, background .2s, opacity .2s;
-}
-.exit-btn:hover { background: rgba(255,242,190,0.12); box-shadow: var(--shadow-strong); }
-@media (max-width: 420px) { .exit-btn { padding: 0.5rem 0.75rem; } }
-
-/* ===========================
-   HONEYPOT (fully invisible to users)
-=========================== */
-.hp-wrap{
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-.hp-wrap input{
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
