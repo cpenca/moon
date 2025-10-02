@@ -39,13 +39,15 @@ html, body {
   line-height: 1.55;
   color: var(--moon-yellow);
   background:
-    radial-gradient(1200px 600px at 50% 110%, rgba(255, 230, 180, 0.08), rgba(255,230,180,0) 60%),
+    radial-gradient(1400px 700px at 50% 115%, rgba(255, 180, 180, 0.18), rgba(255,180,180,0) 65%),
     linear-gradient(
       to top,
-      rgba(255, 183, 161, 0.22) 0%,
-      rgba(255, 183, 161, 0.12) 12%,
-      var(--night-3) 38%,
-      var(--night-2) 70%,
+      rgba(255, 120, 80, 0.55) 0%,   /* strong orange at very bottom */
+      rgba(255, 95, 120, 0.48) 8%,   /* vibrant pink/orange */
+      rgba(220, 80, 160, 0.30) 18%,  /* magenta tones */
+      rgba(140, 90, 200, 0.25) 32%,  /* violet-purple */
+      var(--night-3) 50%,
+      var(--night-2) 75%,
       var(--night-1) 100%
     );
   text-rendering: optimizeLegibility;
