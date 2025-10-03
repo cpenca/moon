@@ -262,3 +262,16 @@ h1 { color: var(--moon-yellow-soft); }
   resize: vertical;
 }
 
+/* === Moonlight Glow on Focus === */
+.page-nominations-form .q input:focus,
+.page-nominations-form .q textarea:focus {
+  border-color: rgba(255, 242, 190, 0.95);
+  background: rgba(0,0,0,0.7);
+  color: var(--moon-yellow-soft);
+  box-shadow: 
+    0 0 10px rgba(255, 242, 190, 0.65),
+    0 0 20px rgba(255, 242, 190, 0.35);
+  transition: border-color .2s ease, box-shadow .3s ease, background .3s ease;
+}
+
+
