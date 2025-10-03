@@ -204,3 +204,61 @@ h1 { color: var(--moon-yellow-soft); }
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* === EXIT BUTTON === */
+.exit-btn {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 10;
+  padding: 0.55rem 1rem;
+  border: 2px solid var(--moon-yellow);
+  border-radius: 14px;
+  color: var(--moon-yellow);
+  background: rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  transition: background .2s, box-shadow .2s, transform .2s;
+}
+.exit-btn:hover {
+  background: rgba(255, 242, 190, 0.15);
+  box-shadow: 0 0 12px rgba(255, 242, 190, 0.6);
+  transform: translateY(-1px);
+}
+.exit-btn:active {
+  transform: scale(0.96);
+}
+
+/* === FORM FIELDS === */
+.page-nominations-form .q input,
+.page-nominations-form .q textarea {
+  background: rgba(0,0,0,0.55);   /* darker background for contrast */
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  padding: 1.1rem 1rem;           /* bigger padding */
+  font-size: 1.05rem;             /* larger text */
+  color: var(--moon-yellow-soft); /* softer, creamier text */
+  width: 100%;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.page-nominations-form .q input::placeholder,
+.page-nominations-form .q textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+.page-nominations-form .q input:focus,
+.page-nominations-form .q textarea:focus {
+  border-color: rgba(255, 242, 190, 0.9);
+  box-shadow: 0 0 8px rgba(255, 242, 190, 0.5);
+  background: rgba(0,0,0,0.7);
+}
+
+/* === TEXTAREAS === */
+.page-nominations-form .q textarea {
+  min-height: 140px;   /* taller for readability */
+  resize: vertical;
+}
+
