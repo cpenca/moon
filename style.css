@@ -135,3 +135,73 @@ h1 { color: var(--moon-yellow-soft); }
 }
 .btn:hover { transform: translateY(-1px); background: rgba(255,242,190,0.12); box-shadow: var(--shadow-strong); }
 .btn:active { transform: scale(0.98); }
+
+/* --- Nominations form: remove panel, cleaner look --- */
+.page-nominations-form .container{
+  background: transparent;
+  backdrop-filter: none;
+  padding: var(--space-2);
+}
+
+.page-nominations-form .wizard{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  width: min(92vw, 820px);
+}
+
+/* Field styling: modern, subtle */
+.page-nominations-form .q input,
+.page-nominations-form .q textarea{
+  background: rgba(255,255,255,0.03);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  color: var(--moon-yellow);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.page-nominations-form .q input::placeholder,
+.page-nominations-form .q textarea::placeholder{
+  color: rgba(255,255,255,0.55);
+}
+.page-nominations-form .q input:focus,
+.page-nominations-form .q textarea:focus{
+  border-color: rgba(255, 242, 190, 0.9);
+  box-shadow: 0 0 0 4px rgba(255, 242, 190, 0.18);
+  background: rgba(255,255,255,0.05);
+}
+
+/* Buttons */
+.page-nominations-form .btn{
+  border-radius: 18px;
+  padding: 0.85rem 1.2rem;
+}
+@media (max-width: 720px){
+  .page-nominations-form .two-col{ grid-template-columns: 1fr; }
+  .page-nominations-form .btn{ width: 100%; }
+}
+
+/* Progress + step titles */
+.page-nominations-form .step-title{ margin-bottom: .5rem; }
+.page-nominations-form .progress{ opacity: .9; margin-bottom: .75rem; }
+
+/* Honeypot: invisible but present */
+.hp-wrap{
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.hp-wrap input{
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
