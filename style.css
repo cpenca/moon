@@ -274,4 +274,38 @@ h1 { color: var(--moon-yellow-soft); }
   transition: border-color .2s ease, box-shadow .3s ease, background .3s ease;
 }
 
+/* === Inline Links (in text, e.g. Phase 2 page) === */
+a {
+  color: #ff9ad6; /* soft pink */
+  text-decoration: underline;
+  transition: color .2s ease;
+}
+
+a:hover {
+  color: #ffc6e0; /* lighter pink on hover */
+}
+
+a:visited {
+  color: #ff9ad6; /* keep consistent pink */
+}
+
+/* === Nav Buttons: coordinated pink hover === */
+.site-nav a {
+  border: 2px solid var(--moon-yellow);
+  color: var(--moon-yellow);
+  text-decoration: none;
+  background: rgba(255,255,255,0.02);
+  font-weight: 700;
+  transition: transform .2s, box-shadow .2s, background .2s, color .2s, border-color .2s;
+}
+
+.site-nav a:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 242, 190, 0.1);
+  border-color: #ff9ad6;   /* pink accent border */
+  color: #ffb8e1;          /* soft pink text */
+  box-shadow: 0 0 12px rgba(255, 154, 214, 0.6);
+}
+
+
 
