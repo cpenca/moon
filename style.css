@@ -64,24 +64,54 @@ h1 { color: var(--moon-yellow-soft); }
   backdrop-filter: blur(4px);
 }
 
-/* ===== Hero (moon) ===== */
+/* ===== Hero (logo) ===== */
 .site-header {
   display: grid;
   place-items: center;
   padding-top: var(--space-3);
+  padding-bottom: var(--space-2);
 }
+
 .moon {
-  width: clamp(150px, 60vw, 200px);
-  height: auto;
+  /* ~1 inch tall (approx), bigger than before */
+  height: clamp(1.05in, 12vh, 1.35in);
+  width: auto;
+  display: block;
+
+  /* glow */
   filter:
-    drop-shadow(0 0 12px rgba(255, 242, 190, 0.55))
-    drop-shadow(0 0 28px rgba(255, 242, 190, 0.28));
-  animation: float 6s ease-in-out infinite;
+    drop-shadow(0 0 14px rgba(255, 242, 190, 0.95))
+    drop-shadow(0 0 36px rgba(255, 242, 190, 0.65))
+    drop-shadow(0 0 72px rgba(255, 242, 190, 0.42))
+    drop-shadow(0 0 120px rgba(255, 210, 160, 0.22));
+
+  /* float + glow pulse */
+  animation:
+    float 6s ease-in-out infinite,
+    glowPulse 8s ease-in-out infinite;
 }
+
 @keyframes float {
   0%   { transform: translateY(0) }
   50%  { transform: translateY(-10px) }
   100% { transform: translateY(0) }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 12px rgba(255, 242, 190, 0.85))
+      drop-shadow(0 0 32px rgba(255, 242, 190, 0.55))
+      drop-shadow(0 0 64px rgba(255, 242, 190, 0.38))
+      drop-shadow(0 0 110px rgba(255, 210, 160, 0.20));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 18px rgba(255, 242, 190, 1))
+      drop-shadow(0 0 44px rgba(255, 242, 190, 0.75))
+      drop-shadow(0 0 90px rgba(255, 242, 190, 0.52))
+      drop-shadow(0 0 150px rgba(255, 210, 160, 0.30));
+  }
 }
 
 /* ===== Nav buttons ===== */
@@ -310,7 +340,3 @@ a:visited {
 .page-nominations .container {
   padding-bottom: 2rem;
 }
-
-
-
-
