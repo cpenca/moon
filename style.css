@@ -71,7 +71,7 @@ h1 { color: var(--moon-yellow-soft); }
   padding-top: var(--space-3);
 }
 .moon {
-  width: clamp(90px, 22vw, 160px);
+  width: clamp(150px, 60vw, 200px);
   height: auto;
   filter:
     drop-shadow(0 0 12px rgba(255, 242, 190, 0.55))
