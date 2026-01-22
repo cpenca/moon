@@ -63,14 +63,12 @@
 
         <div class="q">
           <label for="zip"><strong>ZIP code</strong></label>
-          <!-- Not strict: plain text, no pattern -->
           <input id="zip" name="zip" type="text" required placeholder="example 33133" autocomplete="postal-code">
         </div>
 
         <div class="q">
           <label for="email"><strong>Email address</strong></label>
-          <!-- Not strict: use type=text instead of type=email -->
-          <input id="email" name="email" type="text" required placeholder="" autocomplete="email">
+          <input id="email" name="email" type="text" required autocomplete="email">
         </div>
 
         <div class="q">
@@ -94,7 +92,8 @@
 
   <script>
     /* ===== CONFIG ===== */
-    var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwEOkhxRFzDQKSuztQG-qAVxzaFdhcjlGWTxt44TVq6Pmrk98oOVe5ut4Tm_5eLeNt68A/exec';
+    var FORM_ENDPOINT =
+      'https://script.google.com/macros/s/AKfycbwEOkhxRFzDQKSuztQG-qAVxzaFdhcjlGWTxt44TVq6Pmrk98oOVe5ut4Tm_5eLeNt68A/exec';
 
     /* ===== STATE ===== */
     var startTime = Date.now();
@@ -139,21 +138,17 @@
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload),
-        mode: 'cors'
+        mode: 'no-cors'
       })
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        if (data && data.ok) {
-          resultEl.innerHTML = '<div class="success">✅ Thanks! Your nomination was recorded.</div>';
-          document.getElementById('nominationForm').reset();
-          startTime = Date.now();
-        } else {
-          throw new Error((data && data.error) ? data.error : 'Unknown error');
-        }
+      .then(function () {
+        resultEl.innerHTML = '<div class="success">✅ Thanks! Your nomination was sent.</div>';
+        document.getElementById('nominationForm').reset();
+        startTime = Date.now();
       })
       .catch(function(err){
         console.error(err);
-        resultEl.innerHTML = '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
+        resultEl.innerHTML =
+          '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
       })
       .finally(function(){
         submitBtn.disabled = false;
