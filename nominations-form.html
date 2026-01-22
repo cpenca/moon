@@ -22,71 +22,68 @@
     <p class="intro">Pick a month (or Blue Moon) and submit your nomination.</p>
 
     <div class="wizard">
-
-      <!-- Honeypot -->
+      <!-- Honeypot (hidden from humans, visible to bots) -->
       <div class="hp-wrap" aria-hidden="true">
         <label>Website
           <input type="text"
                  id="website"
                  name="website"
                  autocomplete="off"
-                 tabindex="-1">
+                 tabindex="-1"
+                 inputmode="text"
+                 spellcheck="false">
         </label>
       </div>
 
       <form id="nominationForm" onsubmit="submitForm(event)">
-
         <div class="q">
           <label for="month"><strong>Month</strong></label>
-          <select id="month" required>
+          <select id="month" name="month" required>
             <option value="" disabled selected>Select a month</option>
-            <option>January</option>
-            <option>February</option>
-            <option>March</option>
-            <option>April</option>
-            <option>May</option>
-            <option>June</option>
-            <option>July</option>
-            <option>August</option>
-            <option>September</option>
-            <option>October</option>
-            <option>November</option>
-            <option>December</option>
-            <option>Blue Moon</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+            <option value="Blue Moon">Blue Moon</option>
           </select>
         </div>
 
         <div class="q">
           <label for="name"><strong>Your name</strong></label>
-          <input id="name" type="text" placeholder="Optional">
+          <input id="name" name="name" type="text" placeholder="Optional" autocomplete="name">
         </div>
 
         <div class="q">
           <label for="zip"><strong>ZIP code</strong></label>
-          <input id="zip"
-                 type="text"
-                 required
-                 placeholder="e.g. 33101"
-                 pattern="^\\d{5}(-\\d{4})?$">
-          <div class="subtext">US ZIP (5-digit) or ZIP+4.</div>
+          <!-- Not strict: plain text, no pattern -->
+          <input id="zip" name="zip" type="text" required placeholder="Any format is fine" autocomplete="postal-code">
         </div>
 
         <div class="q">
           <label for="email"><strong>Email address</strong></label>
-          <input id="email" type="email" required placeholder="you@example.com">
+          <!-- Not strict: use type=text instead of type=email -->
+          <input id="email" name="email" type="text" required placeholder="Any format is fine" autocomplete="email">
         </div>
 
         <div class="q">
           <label for="moonName"><strong>Moon name suggestion</strong></label>
-          <input id="moonName" type="text" required>
+          <input id="moonName" name="moonName" type="text" required>
         </div>
 
         <div class="q">
           <label for="explanation"><strong>Brief explanation</strong></label>
-          <textarea id="explanation" required></textarea>
+          <textarea id="explanation" name="explanation" required></textarea>
         </div>
 
-        <div class="controls">
+        <div class="controls" id="controls">
           <button class="btn" id="submitBtn" type="submit">Submit</button>
         </div>
 
@@ -95,110 +92,73 @@
     </div>
   </main>
 
-<script>
-  /* ===== CONFIG ===== */
-  var FORM_ENDPOINT =
-    'https://script.google.com/macros/s/AKfycbzeNpP7xO_6P85VUfzGpMnSfXXgkBU5ML55teNV8njQgjMxV9POBfZvgfczwATqp-TR8g/exec';
+  <script>
+    /* ===== CONFIG ===== */
+    var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxIxUl9lupbWc18WVXHYUBGoMTkFPWo1VK9VPQ5ZaB3hm5-HnHH3veiUMIkuCi7aHOatg/exec';
 
-  /* ===== STATE ===== */
-  var startTime = Date.now();
+    /* ===== STATE ===== */
+    var startTime = Date.now();
 
-  // EXACTLY what the backend previously got, plus Blue Moon at the end.
-  var monthOptions = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December',
-    'Blue Moon'
-  ];
+    function submitForm(e) {
+      e.preventDefault();
 
-  // Create captcha values, same range as your wizard used.
-  function refreshCaptcha() {
-    window._a = Math.floor(Math.random() * 8) + 2; // 2..9
-    window._b = Math.floor(Math.random() * 8) + 2; // 2..9
-  }
-  refreshCaptcha();
+      var website = document.getElementById('website')?.value || '';
+      var elapsedMs = Date.now() - startTime;
 
-  function submitForm(e){
-    e.preventDefault();
+      var month = (document.getElementById('month')?.value || '').trim();
+      var name = (document.getElementById('name')?.value || '').trim();
+      var zip = (document.getElementById('zip')?.value || '').trim();
+      var email = (document.getElementById('email')?.value || '').trim();
+      var moonName = (document.getElementById('moonName')?.value || '').trim();
+      var explanation = (document.getElementById('explanation')?.value || '').trim();
 
-    var website = document.getElementById('website').value || '';
-    var elapsedMs = Date.now() - startTime;
-
-    var month = (document.getElementById('month').value || '').trim();
-    var rawName = (document.getElementById('name').value || '').trim();
-    var zip = (document.getElementById('zip').value || '').trim();
-    var email = (document.getElementById('email').value || '').trim();
-    var moonName = (document.getElementById('moonName').value || '').trim();
-    var explanation = (document.getElementById('explanation').value || '').trim();
-
-    if (!month || !zip || !email || !moonName || !explanation) {
-      document.getElementById('result').innerHTML =
-        '<div class="error">❌ Please complete all required fields.</div>';
-      return;
-    }
-
-    // Keep backend keys EXACT: name + email + months + captcha + website + elapsedMs
-    // Store ZIP inside name so we don’t add new top-level keys (avoids strict backend rejects).
-    var name = rawName ? (rawName + ' (ZIP ' + zip + ')') : ('(ZIP ' + zip + ')');
-
-    // Build months array (13 entries). Only the selected month is filled.
-    var monthsArr = monthOptions.map(function(m){
-      return { month: m, name: '', explanation: '' };
-    });
-
-    var idx = monthOptions.indexOf(month);
-    if (idx >= 0) {
-      monthsArr[idx] = { month: monthOptions[idx], name: moonName, explanation: explanation };
-    }
-
-    // IMPORTANT: Send captcha exactly like before:
-    // captcha.a and captcha.b are the operands, captcha.ans is the user's answer.
-    // Here we auto-answer, but keep it in the same field.
-    var a = window._a;
-    var b = window._b;
-    var ans = a + b;
-
-    var payload = {
-      website: website,
-      elapsedMs: elapsedMs,
-      captcha: { a: a, b: b, ans: ans },
-      name: name,
-      email: email,
-      months: monthsArr
-    };
-
-    var submitBtn = document.getElementById('submitBtn');
-    var resultEl = document.getElementById('result');
-
-    submitBtn.disabled = true;
-    resultEl.innerHTML = '';
-
-    fetch(FORM_ENDPOINT, {
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(payload),
-      mode:'cors'
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(data && data.ok){
-        resultEl.innerHTML =
-          '<div class="success">✅ Thanks! Your nomination was recorded.</div>';
-        document.getElementById('nominationForm').reset();
-        startTime = Date.now();
-        refreshCaptcha(); // new captcha each submission
-      } else {
-        throw new Error((data && data.error) ? data.error : 'Unknown error');
+      if (!month || !zip || !email || !moonName || !explanation) {
+        document.getElementById('result').innerHTML =
+          '<div class="error">❌ Please complete all required fields.</div>';
+        return;
       }
-    })
-    .catch(function(err){
-      console.error(err);
-      resultEl.innerHTML =
-        '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
-    })
-    .finally(function(){
-      submitBtn.disabled = false;
-    });
-  }
-</script>
+
+      var payload = {
+        website: website,
+        elapsedMs: elapsedMs,
+        name: name,
+        zip: zip,
+        email: email,
+        month: month,
+        moonName: moonName,
+        explanation: explanation
+      };
+
+      var submitBtn = document.getElementById('submitBtn');
+      var resultEl = document.getElementById('result');
+
+      submitBtn.disabled = true;
+      resultEl.innerHTML = '';
+
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        mode: 'cors'
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data && data.ok) {
+          resultEl.innerHTML = '<div class="success">✅ Thanks! Your nomination was recorded.</div>';
+          document.getElementById('nominationForm').reset();
+          startTime = Date.now();
+        } else {
+          throw new Error((data && data.error) ? data.error : 'Unknown error');
+        }
+      })
+      .catch(function(err){
+        console.error(err);
+        resultEl.innerHTML = '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
+      })
+      .finally(function(){
+        submitBtn.disabled = false;
+      });
+    }
+  </script>
 </body>
 </html>
