@@ -6,19 +6,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Soft fade/slide animation for swapping form <-> post-submit */
-    .fade-swap {
-      transition: opacity 240ms ease, transform 240ms ease;
+    /* Swap container keeps the message anchored where the form was */
+    .swap-wrap { position: relative; }
+
+    /* Smooth swap animation */
+    .panel {
+      transition: opacity 220ms ease, transform 220ms ease;
       opacity: 1;
       transform: translateY(0);
     }
-    .fade-swap.is-hidden {
+    .panel.is-hidden {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(10px);
       pointer-events: none;
     }
-    /* Keep layout stable while hidden */
-    .swap-wrap { position: relative; }
+
+    /* Overlap panels so there's no "empty space" */
+    #postSubmit {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* A neat card for the success + actions */
+    .post-card {
+      width: min(560px, 100%);
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .post-card .success {
+      margin: 0 0 12px 0;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      margin-top: 10px;
+    }
+
+    /* Make the two action buttons look consistent even if .btn is styled elsewhere */
+    .post-actions .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
@@ -48,9 +91,9 @@
         </label>
       </div>
 
-      <div class="swap-wrap">
-        <!-- Form -->
-        <form id="nominationForm" class="fade-swap" onsubmit="submitForm(event)">
+      <div class="swap-wrap" id="swapWrap">
+        <!-- Form panel -->
+        <form id="nominationForm" class="panel" onsubmit="submitForm(event)">
           <div class="q">
             <label for="month"><strong>Month</strong></label>
             <select id="month" required>
@@ -103,16 +146,18 @@
           <div id="result"></div>
         </form>
 
-        <!-- Post-submit actions -->
-        <div id="postSubmit" class="fade-swap is-hidden" aria-hidden="true" style="display:block; margin-top:1.5rem;">
-          <div id="postMessage"></div>
-          <p style="margin-top:1rem;"><strong>What would you like to do next?</strong></p>
-          <div class="controls">
-            <a class="btn" href="nominations.html">Exit</a>
-            <button class="btn" type="button" onclick="submitAnother()">Submit another nomination</button>
+        <!-- Post-submit panel (overlays the form area) -->
+        <div id="postSubmit" class="panel is-hidden" aria-hidden="true">
+          <div class="post-card">
+            <div id="postMessage"></div>
+            <div class="post-actions">
+              <a class="btn" href="nominations.html">Exit</a>
+              <button class="btn" type="button" onclick="submitAnother()">Submit another nomination</button>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </main>
 
@@ -127,20 +172,15 @@
     var post = document.getElementById('postSubmit');
 
     if (showPost) {
-      // animate form out, then post in
       form.classList.add('is-hidden');
       form.setAttribute('aria-hidden', 'true');
-      setTimeout(function () {
-        post.classList.remove('is-hidden');
-        post.setAttribute('aria-hidden', 'false');
-      }, 30);
+      post.classList.remove('is-hidden');
+      post.setAttribute('aria-hidden', 'false');
     } else {
       post.classList.add('is-hidden');
       post.setAttribute('aria-hidden', 'true');
-      setTimeout(function () {
-        form.classList.remove('is-hidden');
-        form.setAttribute('aria-hidden', 'false');
-      }, 30);
+      form.classList.remove('is-hidden');
+      form.setAttribute('aria-hidden', 'false');
     }
   }
 
@@ -163,7 +203,7 @@
       return;
     }
 
-    // Remember name/email for future submissions (in this browser)
+    // Remember name/email between submissions
     try {
       localStorage.setItem('moon_nom_name', name);
       localStorage.setItem('moon_nom_email', email);
@@ -208,11 +248,10 @@
   }
 
   function submitAnother() {
-    // keep name/email, clear the rest
     var form = document.getElementById('nominationForm');
     form.reset();
 
-    // restore remembered values
+    // Restore remembered values
     try {
       var savedName = localStorage.getItem('moon_nom_name') || '';
       var savedEmail = localStorage.getItem('moon_nom_email') || '';
@@ -220,21 +259,17 @@
       document.getElementById('email').value = savedEmail;
     } catch (err) {}
 
-    // clear other fields explicitly (just to be safe)
+    // Ensure month resets to placeholder
     document.getElementById('month').value = '';
-    document.getElementById('zip').value = '';
-    document.getElementById('moonName').value = '';
-    document.getElementById('explanation').value = '';
 
     document.getElementById('result').innerHTML = '';
     startTime = Date.now();
     swapViews(false);
 
-    // focus month for the next submission
-    setTimeout(function(){ document.getElementById('month').focus(); }, 260);
+    setTimeout(function(){ document.getElementById('month').focus(); }, 240);
   }
 
-  // On load, prefill saved name/email if present
+  // Prefill saved name/email on load
   (function initPrefill(){
     try {
       var savedName = localStorage.getItem('moon_nom_name') || '';
