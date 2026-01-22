@@ -5,6 +5,21 @@
   <title>Nominations Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Soft fade/slide animation for swapping form <-> post-submit */
+    .fade-swap {
+      transition: opacity 240ms ease, transform 240ms ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-swap.is-hidden {
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+    }
+    /* Keep layout stable while hidden */
+    .swap-wrap { position: relative; }
+  </style>
 </head>
 
 <body class="page-nominations-form">
@@ -22,138 +37,212 @@
     <p class="intro">Pick a month (or Blue Moon) and submit your nomination.</p>
 
     <div class="wizard">
-      <!-- Honeypot (hidden from humans, visible to bots) -->
+      <!-- Honeypot -->
       <div class="hp-wrap" aria-hidden="true">
         <label>Website
           <input type="text"
                  id="website"
                  name="website"
                  autocomplete="off"
-                 tabindex="-1"
-                 inputmode="text"
-                 spellcheck="false">
+                 tabindex="-1">
         </label>
       </div>
 
-      <form id="nominationForm" onsubmit="submitForm(event)">
-        <div class="q">
-          <label for="month"><strong>Month</strong></label>
-          <select id="month" name="month" required>
-            <option value="" disabled selected>Select a month</option>
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-            <option value="Blue Moon">Blue Moon</option>
-          </select>
-        </div>
+      <div class="swap-wrap">
+        <!-- Form -->
+        <form id="nominationForm" class="fade-swap" onsubmit="submitForm(event)">
+          <div class="q">
+            <label for="month"><strong>Month</strong></label>
+            <select id="month" required>
+              <option value="" disabled selected>Select a month</option>
+              <option>January</option>
+              <option>February</option>
+              <option>March</option>
+              <option>April</option>
+              <option>May</option>
+              <option>June</option>
+              <option>July</option>
+              <option>August</option>
+              <option>September</option>
+              <option>October</option>
+              <option>November</option>
+              <option>December</option>
+              <option>Blue Moon</option>
+            </select>
+          </div>
 
-        <div class="q">
-          <label for="name"><strong>Your name</strong></label>
-          <input id="name" name="name" type="text" placeholder="Optional" autocomplete="name">
-        </div>
+          <div class="q">
+            <label for="name"><strong>Your name</strong></label>
+            <input id="name" type="text" placeholder="Optional" autocomplete="name">
+          </div>
 
-        <div class="q">
-          <label for="zip"><strong>ZIP code</strong></label>
-          <input id="zip" name="zip" type="text" required placeholder="example 33133" autocomplete="postal-code">
-        </div>
+          <div class="q">
+            <label for="zip"><strong>ZIP code</strong></label>
+            <input id="zip" type="text" required placeholder="example 33133" autocomplete="postal-code">
+          </div>
 
-        <div class="q">
-          <label for="email"><strong>Email address</strong></label>
-          <input id="email" name="email" type="text" required autocomplete="email">
-        </div>
+          <div class="q">
+            <label for="email"><strong>Email address</strong></label>
+            <input id="email" type="text" required autocomplete="email">
+          </div>
 
-        <div class="q">
-          <label for="moonName"><strong>Moon name suggestion</strong></label>
-          <input id="moonName" name="moonName" type="text" required>
-        </div>
+          <div class="q">
+            <label for="moonName"><strong>Moon name suggestion</strong></label>
+            <input id="moonName" type="text" required>
+          </div>
 
-        <div class="q">
-          <label for="explanation"><strong>Brief explanation</strong></label>
-          <textarea id="explanation" name="explanation" required></textarea>
-        </div>
+          <div class="q">
+            <label for="explanation"><strong>Brief explanation</strong></label>
+            <textarea id="explanation" required></textarea>
+          </div>
 
-        <div class="controls" id="controls">
-          <button class="btn" id="submitBtn" type="submit">Submit</button>
-        </div>
+          <div class="controls">
+            <button class="btn" id="submitBtn" type="submit">Submit</button>
+          </div>
 
-        <div id="result"></div>
-      </form>
+          <div id="result"></div>
+        </form>
+
+        <!-- Post-submit actions -->
+        <div id="postSubmit" class="fade-swap is-hidden" aria-hidden="true" style="display:block; margin-top:1.5rem;">
+          <div id="postMessage"></div>
+          <p style="margin-top:1rem;"><strong>What would you like to do next?</strong></p>
+          <div class="controls">
+            <a class="btn" href="nominations.html">Exit</a>
+            <button class="btn" type="button" onclick="submitAnother()">Submit another nomination</button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
-  <script>
-    /* ===== CONFIG ===== */
-    var FORM_ENDPOINT =
-      'https://script.google.com/macros/s/AKfycbwEOkhxRFzDQKSuztQG-qAVxzaFdhcjlGWTxt44TVq6Pmrk98oOVe5ut4Tm_5eLeNt68A/exec';
+<script>
+  var FORM_ENDPOINT =
+    'https://script.google.com/macros/s/AKfycbwEOkhxRFzDQKSuztQG-qAVxzaFdhcjlGWTxt44TVq6Pmrk98oOVe5ut4Tm_5eLeNt68A/exec';
 
-    /* ===== STATE ===== */
-    var startTime = Date.now();
+  var startTime = Date.now();
 
-    function submitForm(e) {
-      e.preventDefault();
+  function swapViews(showPost) {
+    var form = document.getElementById('nominationForm');
+    var post = document.getElementById('postSubmit');
 
-      var website = document.getElementById('website')?.value || '';
-      var elapsedMs = Date.now() - startTime;
-
-      var month = (document.getElementById('month')?.value || '').trim();
-      var name = (document.getElementById('name')?.value || '').trim();
-      var zip = (document.getElementById('zip')?.value || '').trim();
-      var email = (document.getElementById('email')?.value || '').trim();
-      var moonName = (document.getElementById('moonName')?.value || '').trim();
-      var explanation = (document.getElementById('explanation')?.value || '').trim();
-
-      if (!month || !zip || !email || !moonName || !explanation) {
-        document.getElementById('result').innerHTML =
-          '<div class="error">❌ Please complete all required fields.</div>';
-        return;
-      }
-
-      var payload = {
-        website: website,
-        elapsedMs: elapsedMs,
-        name: name,
-        zip: zip,
-        email: email,
-        month: month,
-        moonName: moonName,
-        explanation: explanation
-      };
-
-      var submitBtn = document.getElementById('submitBtn');
-      var resultEl = document.getElementById('result');
-
-      submitBtn.disabled = true;
-      resultEl.innerHTML = '';
-
-      fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-        mode: 'no-cors'
-      })
-      .then(function () {
-        resultEl.innerHTML = '<div class="success">✅ Thanks! Your nomination was sent.</div>';
-        document.getElementById('nominationForm').reset();
-        startTime = Date.now();
-      })
-      .catch(function(err){
-        console.error(err);
-        resultEl.innerHTML =
-          '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
-      })
-      .finally(function(){
-        submitBtn.disabled = false;
-      });
+    if (showPost) {
+      // animate form out, then post in
+      form.classList.add('is-hidden');
+      form.setAttribute('aria-hidden', 'true');
+      setTimeout(function () {
+        post.classList.remove('is-hidden');
+        post.setAttribute('aria-hidden', 'false');
+      }, 30);
+    } else {
+      post.classList.add('is-hidden');
+      post.setAttribute('aria-hidden', 'true');
+      setTimeout(function () {
+        form.classList.remove('is-hidden');
+        form.setAttribute('aria-hidden', 'false');
+      }, 30);
     }
-  </script>
+  }
+
+  function submitForm(e) {
+    e.preventDefault();
+
+    var website = document.getElementById('website').value || '';
+    var elapsedMs = Date.now() - startTime;
+
+    var month = (document.getElementById('month').value || '').trim();
+    var name = (document.getElementById('name').value || '').trim();
+    var zip = (document.getElementById('zip').value || '').trim();
+    var email = (document.getElementById('email').value || '').trim();
+    var moonName = (document.getElementById('moonName').value || '').trim();
+    var explanation = (document.getElementById('explanation').value || '').trim();
+
+    if (!month || !zip || !email || !moonName || !explanation) {
+      document.getElementById('result').innerHTML =
+        '<div class="error">❌ Please complete all required fields.</div>';
+      return;
+    }
+
+    // Remember name/email for future submissions (in this browser)
+    try {
+      localStorage.setItem('moon_nom_name', name);
+      localStorage.setItem('moon_nom_email', email);
+    } catch (err) {}
+
+    var payload = {
+      website: website,
+      elapsedMs: elapsedMs,
+      name: name,
+      zip: zip,
+      email: email,
+      month: month,
+      moonName: moonName,
+      explanation: explanation
+    };
+
+    var submitBtn = document.getElementById('submitBtn');
+    var resultEl = document.getElementById('result');
+
+    submitBtn.disabled = true;
+    resultEl.innerHTML = '';
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    })
+    .then(function () {
+      document.getElementById('postMessage').innerHTML =
+        '<div class="success">✅ Thanks! Your nomination was sent.</div>';
+      swapViews(true);
+    })
+    .catch(function(err){
+      console.error(err);
+      resultEl.innerHTML =
+        '<div class="error">❌ Submission failed: ' + String(err) + '</div>';
+    })
+    .finally(function(){
+      submitBtn.disabled = false;
+    });
+  }
+
+  function submitAnother() {
+    // keep name/email, clear the rest
+    var form = document.getElementById('nominationForm');
+    form.reset();
+
+    // restore remembered values
+    try {
+      var savedName = localStorage.getItem('moon_nom_name') || '';
+      var savedEmail = localStorage.getItem('moon_nom_email') || '';
+      document.getElementById('name').value = savedName;
+      document.getElementById('email').value = savedEmail;
+    } catch (err) {}
+
+    // clear other fields explicitly (just to be safe)
+    document.getElementById('month').value = '';
+    document.getElementById('zip').value = '';
+    document.getElementById('moonName').value = '';
+    document.getElementById('explanation').value = '';
+
+    document.getElementById('result').innerHTML = '';
+    startTime = Date.now();
+    swapViews(false);
+
+    // focus month for the next submission
+    setTimeout(function(){ document.getElementById('month').focus(); }, 260);
+  }
+
+  // On load, prefill saved name/email if present
+  (function initPrefill(){
+    try {
+      var savedName = localStorage.getItem('moon_nom_name') || '';
+      var savedEmail = localStorage.getItem('moon_nom_email') || '';
+      if (savedName) document.getElementById('name').value = savedName;
+      if (savedEmail) document.getElementById('email').value = savedEmail;
+    } catch (err) {}
+  })();
+</script>
 </body>
 </html>
