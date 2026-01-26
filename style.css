@@ -73,22 +73,20 @@ h1 { color: var(--moon-yellow-soft); }
 }
 
 .moon {
-  /* ~1 inch tall (approx), bigger than before */
+  /* ~1 inch tall (approx) */
   height: clamp(3.05in, 36vh, 3.35in);
   width: auto;
   display: block;
 
-  /* glow */
+  /* static glow only */
   filter:
     drop-shadow(0 0 14px rgba(255, 242, 190, 0.95))
     drop-shadow(0 0 36px rgba(255, 242, 190, 0.65))
     drop-shadow(0 0 72px rgba(255, 242, 190, 0.42))
     drop-shadow(0 0 120px rgba(255, 210, 160, 0.22));
 
-  /* float + glow pulse */
-  animation:
-    float 6s ease-in-out infinite,
-    glowPulse 8s ease-in-out infinite;
+  animation: none;
+  transform: none;
 }
 
 @keyframes float {
