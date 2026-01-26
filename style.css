@@ -112,6 +112,21 @@ h1 { color: var(--moon-yellow-soft); }
   }
 }
 
+/* ===== Project title under the moon ===== */
+.project-title{
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem); /* larger but not huge */
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--moon-yellow-soft);
+  text-shadow:
+    0 0 6px rgba(0,0,0,0.65),
+    0 0 12px rgba(0,0,0,0.5);
+}
+
+
+
 /* ===== Nav buttons ===== */
 .site-nav {
   display: flex;
