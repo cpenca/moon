@@ -1,3 +1,4 @@
+<!-- voting.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +8,8 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* Page-specific additions that match your system */
-    .card {
+    /* Page-specific additions (kept minimal, matches your style system) */
+    .card{
       border: var(--border);
       border-radius: var(--radius);
       background: rgba(255,255,255,0.06);
@@ -18,18 +19,18 @@
     }
 
     .form-row{
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-      align-items: stretch;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:16px;
+      align-items:stretch;
     }
 
     .field{
-      flex: 1 1 280px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      flex:1 1 280px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
     }
 
     label{
@@ -38,14 +39,14 @@
     }
 
     input[type="email"]{
-      width: 100%;
-      padding: 14px 16px;
+      width:100%;
+      padding:14px 16px;
       border-radius: var(--radius);
       border: var(--border);
       background: rgba(0,0,0,0.12);
       color: var(--ink);
       font-size: var(--fs-base);
-      outline: none;
+      outline:none;
     }
 
     input[type="email"]::placeholder{
@@ -53,21 +54,21 @@
     }
 
     .btn{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px 18px;
       border-radius: var(--radius);
       border: var(--border);
       background: rgba(255,255,255,0.14);
       color: rgba(255,255,255,0.92);
-      text-decoration: none;
+      text-decoration:none;
       font-size: var(--fs-nav);
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      cursor: pointer;
+      font-weight:600;
+      letter-spacing:0.01em;
+      cursor:pointer;
       transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      white-space: nowrap;
+      white-space:nowrap;
     }
 
     .btn:hover{
@@ -77,20 +78,20 @@
     }
 
     .btn:disabled{
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
+      opacity:0.6;
+      cursor:not-allowed;
+      transform:none;
     }
 
     .fineprint{
-      margin-top: 10px;
-      font-size: 0.95em;
+      margin-top:10px;
+      font-size:0.95em;
       color: var(--ink-faint);
     }
 
     .status{
-      margin-top: 12px;
-      min-height: 22px;
+      margin-top:12px;
+      min-height:22px;
       color: var(--ink-soft);
     }
     .status.ok{ color: rgba(185,255,218,0.95); }
@@ -100,8 +101,8 @@
 
 <body>
   <header class="site-header container">
-    <!-- Brand (match your homepage structure) -->
     <a class="brand" href="index.html" aria-label="O, Miami home">
+      <!-- Update filename if yours is different -->
       <img class="brand-moon moon-bounce" src="moon.png" alt="" />
       <span class="brand-text">, Miami</span>
     </a>
@@ -117,7 +118,8 @@
     <p>If you would like to receive a reminder please join the mailing list.</p>
 
     <section class="card" aria-label="Mailing list signup">
-      <form id="mailingForm">
+      <!-- Important: normal form POST (no fetch) avoids Safari “Load failed” / CORS problems -->
+      <form id="mailingForm" method="POST" target="hidden_iframe">
         <div class="form-row">
           <div class="field">
             <label for="email">Email address</label>
@@ -136,62 +138,66 @@
 
         <div class="fineprint">We’ll only use this to send a voting reminder.</div>
         <div id="status" class="status" role="status" aria-live="polite"></div>
+
+        <!-- Hidden iframe keeps the page from navigating away -->
+        <iframe name="hidden_iframe" style="display:none;"></iframe>
       </form>
     </section>
   </main>
 
   <script>
-    // Paste your deployed Google Apps Script Web App URL here:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsvU69Ab22L-CahjuI9EMKvIv4LrbfQPjfVoBols9LPzqjpFdm8wLE6WuVxmHl2eQQ/exec";
+    // 1) Paste your deployed Google Apps Script Web App URL (the one ending in /exec)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzH3n5dQ2EVoOLQu7Xpdxg_hIAu9blNzY8RFIkL6cSUyGyIP4OTioUdQbAIUGAIbaC_/exec";
 
     const form = document.getElementById("mailingForm");
     const emailEl = document.getElementById("email");
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("submitBtn");
 
-    function setStatus(msg, kind) {
+    function setStatus(msg, kind){
       statusEl.textContent = msg || "";
       statusEl.className = "status" + (kind ? " " + kind : "");
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      setStatus("");
+    // Point the form to Apps Script
+    form.action = SCRIPT_URL;
 
-      const email = emailEl.value.trim();
-      if (!email) return;
+    // Add hidden fields Apps Script reads via e.parameter.*
+    function ensureHidden(name, value){
+      let el = form.querySelector(`input[name="${name}"]`);
+      if (!el){
+        el = document.createElement("input");
+        el.type = "hidden";
+        el.name = name;
+        form.appendChild(el);
+      }
+      el.value = value;
+    }
 
-      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR")) {
-        setStatus("Missing server URL. Add your Apps Script Web App URL in voting.html.", "err");
+    form.addEventListener("submit", (e) => {
+      // Guard: URL missing
+      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR")){
+        e.preventDefault();
+        setStatus("Missing server URL. Paste your Apps Script Web App URL into voting.html.", "err");
         return;
       }
 
+      ensureHidden("page", "voting");
+      ensureHidden("timestamp", new Date().toISOString());
+      ensureHidden("userAgent", navigator.userAgent);
+
       btn.disabled = true;
-      btn.textContent = "Submitting...";
+      btn.textContent = "Submitting…";
+      setStatus("Submitting…");
 
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            page: "voting",
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent
-          })
-        });
-
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || data.ok !== true) throw new Error(data.error || "Submission failed.");
-
-        emailEl.value = "";
-        setStatus("You’re on the list. We’ll remind you when voting opens.", "ok");
-      } catch (err) {
-        setStatus(err.message || "Something went wrong. Please try again.", "err");
-      } finally {
+      // We can't read the cross-origin response in the iframe,
+      // so we show success UI after a short delay.
+      setTimeout(() => {
         btn.disabled = false;
         btn.textContent = "Join mailing list";
-      }
+        emailEl.value = "";
+        setStatus("You’re on the list. We’ll remind you when voting opens.", "ok");
+      }, 700);
     });
   </script>
 </body>
