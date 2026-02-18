@@ -2,29 +2,208 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Phase 2: Voting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Voting</title>
+  <style>
+    :root{
+      --bg:#0b1f4a;
+      --card:#0f2a63;
+      --text:#f3f6ff;
+      --muted:#c9d5ff;
+      --border:rgba(255,255,255,.18);
+      --shadow: 0 18px 60px rgba(0,0,0,.25);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 30% 20%, rgba(255,255,255,.12), transparent 55%),
+                  radial-gradient(900px 500px at 70% 70%, rgba(255,255,255,.10), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      padding:24px;
+    }
+    .wrap{
+      width:min(720px, 100%);
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius:24px;
+      box-shadow: var(--shadow);
+      padding:28px;
+      overflow:hidden;
+      position:relative;
+    }
+    h1{
+      margin:0 0 10px 0;
+      font-size: clamp(28px, 4vw, 40px);
+      letter-spacing: .2px;
+    }
+    p{
+      margin:0 0 18px 0;
+      color:var(--muted);
+      font-size: 16px;
+      line-height:1.5;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    form{
+      margin-top: 18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:stretch;
+    }
+    input[type="email"]{
+      flex: 1 1 260px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline: none;
+      font-size: 16px;
+    }
+    input[type="email"]::placeholder{color: rgba(201,213,255,.75)}
+    button{
+      flex: 0 0 auto;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.14);
+      color: var(--text);
+      cursor:pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .fineprint{
+      margin-top: 10px;
+      font-size: 13px;
+      color: rgba(201,213,255,.85);
+    }
+    .status{
+      margin-top: 14px;
+      font-size: 14px;
+      min-height: 20px;
+      color: var(--muted);
+    }
+    .status.ok{ color: #b9ffda; }
+    .status.err{ color: #ffd0d0; }
+
+    /* subtle “moon” */
+    .moon{
+      position:absolute;
+      width:240px; height:240px;
+      border-radius:50%;
+      right:-80px; top:-80px;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.55), rgba(255,255,255,.16) 45%, rgba(255,255,255,.08) 70%, rgba(255,255,255,.04));
+      filter: blur(.2px);
+      opacity:.55;
+      pointer-events:none;
+    }
+  </style>
 </head>
-<body class="page-voting">
-  <!-- Moon -->
-  <header class="site-header">
-    <img src="Omiami_moon.png" alt="Full Moon" class="moon" />
-    <div class="project-title">Moons for Miami: Naming La Luna</div>
-  </header>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="moon" aria-hidden="true"></div>
 
-  <!-- Nav (current page hidden via aria-current="page") -->
-  <nav class="site-nav">
-    <a href="index.html">About</a>
-    <a href="nominations.html">Phase 1: Nominations</a>
-    <a href="voting.html" aria-current="page">Phase 2: Voting</a>
-  </nav>
+      <div class="pill">🌙 Voting</div>
+      <h1>Voting will open March 1st.</h1>
+      <p>If you would like to receive a reminder please join the mailing list.</p>
 
-  <main class="container">
-    <h1>Phase 2: Voting</h1>
-    <p class="vote-note">
-      Voting will begin once the <a href="nominations.html">nomination</a> phase is complete.
-    </p>
-  </main>
+      <form id="mailingForm">
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+        <button id="submitBtn" type="submit">Join mailing list</button>
+      </form>
+
+      <div class="fineprint">We’ll only use this to send a voting reminder.</div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script>
+    // TODO: paste your deployed Apps Script Web App URL here
+    const SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    const form = document.getElementById("mailingForm");
+    const emailEl = document.getElementById("email");
+    const statusEl = document.getElementById("status");
+    const btn = document.getElementById("submitBtn");
+
+    function setStatus(message, kind) {
+      statusEl.textContent = message || "";
+      statusEl.className = "status" + (kind ? " " + kind : "");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      setStatus("");
+
+      const email = emailEl.value.trim();
+      if (!email) return;
+
+      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR")) {
+        setStatus("Missing server URL. Add your Apps Script Web App URL in the page code.", "err");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+
+      try {
+        // Send as JSON
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            page: "voting",
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || data.ok !== true) {
+          throw new Error(data.error || "Submission failed.");
+        }
+
+        emailEl.value = "";
+        setStatus("You’re on the list. We’ll remind you when voting opens.", "ok");
+      } catch (err) {
+        setStatus(err.message || "Something went wrong. Please try again.", "err");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Join mailing list";
+      }
+    });
+  </script>
 </body>
 </html>
