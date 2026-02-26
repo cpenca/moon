@@ -1,368 +1,355 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Moon Voting</title>
+  <meta charset="UTF-8" />
+  <title>Moons for Miami — Phase 2: Voting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Minimal fallback styles in case your CSS doesn't include these */
-    .moon-wrap{max-width:980px;margin:0 auto;padding:24px;}
-    .moon-card{border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:18px;background:rgba(255,255,255,.06)}
-    .moon-row{display:flex;gap:12px;flex-wrap:wrap}
-    .moon-field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:220px}
-    .moon-field input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);color:#fff}
-    .moon-month-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:18px 0 10px}
-    .moon-month-title{font-size:28px;margin:0}
-    .moon-progress{opacity:.75}
-    .moon-options{display:grid;gap:12px}
-    .moon-option{position:relative;cursor:pointer;border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px 14px;background:rgba(255,255,255,.06)}
-    .moon-option:hover{border-color:rgba(255,255,255,.30)}
-    .moon-option.selected{border-color:rgba(140,170,255,.9);background:rgba(90,108,179,.18)}
-    .moon-option .check{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:8px;border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:transparent;font-weight:800}
-    .moon-option.selected .check{color:#fff;border-color:rgba(140,170,255,.9)}
-    .moon-optname{margin:0 0 6px;font-size:18px}
-    .moon-optexpl{margin:0;opacity:.78;line-height:1.35}
-    .moon-nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
-    .moon-btn{padding:11px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-weight:700}
-    .moon-btn[disabled]{opacity:.45;cursor:not-allowed}
-    .moon-btn.primary{border-color:rgba(140,170,255,.65);background:rgba(90,108,179,.25)}
-    .moon-btn.success{border-color:rgba(120,240,180,.55);background:rgba(80,200,140,.14)}
-    .moon-status{margin:10px 0 0;opacity:.8}
-    .moon-err{margin:10px 0 0;color:rgba(255,120,120,.95)}
-    .moon-small{opacity:.75;font-size:13px}
-  </style>
 </head>
 
-<body>
-  <main class="moon-wrap">
-    <section class="moon-card">
-      <h1 style="margin:0 0 6px;">Moon Voting</h1>
-      <p class="moon-small" style="margin:0 0 14px;">Enter your info, then vote month-by-month.</p>
+<body class="page-voting">
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="https://omiami.org" target="_blank" rel="noopener" aria-label="O, Miami">
+        <img src="moon3.png" alt="" class="brand-moon moon-bounce" />
+        <span class="brand-text">, Miami</span>
+      </a>
 
-      <!-- Step 0: Identity -->
-      <div id="stepIdentity">
-        <div class="moon-row">
-          <label class="moon-field">
-            <span class="moon-small">Name</span>
-            <input id="name" type="text" autocomplete="name" placeholder="Your name" />
-          </label>
-          <label class="moon-field">
-            <span class="moon-small">Email</span>
-            <input id="email" type="email" autocomplete="email" placeholder="you@example.com" />
-          </label>
-        </div>
+      <div class="project-title">Moons for Miami</div>
+    </div>
+  </header>
 
-        <div class="moon-nav" style="margin-top:16px;">
-          <span></span>
-          <button id="beginBtn" class="moon-btn primary">Begin →</button>
-        </div>
-        <p id="identityErr" class="moon-err" aria-live="polite"></p>
+  <!-- Nav -->
+  <nav class="site-nav" aria-label="Site navigation">
+    <a href="index.html" class="cta-primary">Home</a>
+    <a href="nominations.html">Phase 1: Nominations</a>
+    <a href="voting.html">Phase 2: Voting</a>
+  </nav>
+
+  <!-- Main -->
+  <main class="container">
+    <h1>Phase 2: Voting</h1>
+    <p>Enter your name and email, then vote month-by-month. One pick per month.</p>
+
+    <!-- Step 0: identity -->
+    <section id="stepIdentity" class="panel">
+      <div class="grid-2">
+        <label class="field">
+          <span class="label">Name</span>
+          <input id="name" class="input" type="text" autocomplete="name" placeholder="Your name" />
+        </label>
+
+        <label class="field">
+          <span class="label">Email</span>
+          <input id="email" class="input" type="email" autocomplete="email" placeholder="you@example.com" />
+        </label>
       </div>
 
-      <!-- Step 1: Voting -->
-      <div id="stepVoting" style="display:none;">
-        <div class="moon-month-head">
-          <h2 id="monthTitle" class="moon-month-title">January</h2>
-          <div id="progress" class="moon-progress">Month 1 of 13</div>
-        </div>
-        <p id="who" class="moon-small" style="margin:0 0 12px;"></p>
-
-        <div id="options" class="moon-options"></div>
-
-        <div class="moon-nav">
-          <button id="backBtn" class="moon-btn">← Back</button>
-          <button id="nextBtn" class="moon-btn primary">Next →</button>
-        </div>
-
-        <div class="moon-nav" style="margin-top:12px;">
-          <button id="reviewBtn" class="moon-btn">Review selections</button>
-          <button id="submitBtn" class="moon-btn success">Submit</button>
-        </div>
-
-        <p id="status" class="moon-status" aria-live="polite"></p>
-        <p id="voteErr" class="moon-err" aria-live="polite"></p>
+      <div class="row-between">
+        <div></div>
+        <button id="beginBtn" class="btn btn-primary" type="button">Begin →</button>
       </div>
+
+      <p id="identityErr" class="msg msg-error" aria-live="polite"></p>
+    </section>
+
+    <!-- Step 1: voting wizard -->
+    <section id="stepVoting" class="panel" style="display:none;">
+      <div class="row-between month-head">
+        <div>
+          <div id="monthTitle" class="month-title">January</div>
+          <div id="progress" class="month-progress">Month 1 of 13</div>
+        </div>
+        <div id="who" class="who"></div>
+      </div>
+
+      <div id="options" class="options" aria-live="polite"></div>
+
+      <div class="row-between nav-row">
+        <button id="backBtn" class="btn" type="button">← Back</button>
+        <button id="nextBtn" class="btn btn-primary" type="button">Next →</button>
+      </div>
+
+      <div class="row-between nav-row" style="margin-top:12px;">
+        <button id="reviewBtn" class="btn" type="button">Review selections</button>
+        <button id="submitBtn" class="btn btn-success" type="button">Submit</button>
+      </div>
+
+      <p id="status" class="msg" aria-live="polite"></p>
+      <p id="voteErr" class="msg msg-error" aria-live="polite"></p>
     </section>
   </main>
 
-<script>
-/** 1) Put your Apps Script Web App URL here */
-const SCRIPT_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+  <script>
+    // ====== CONFIG ======
+    const SCRIPT_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
 
-/** 2) Month order */
-const MONTHS = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
-  "Blue Moon"
-];
+    const MONTHS = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December",
+      "Blue Moon"
+    ];
 
-/** 3) Replace with your real nominations (4 per month) */
-const NOMINEES = {
-  "January": [
-    { name: "Xiomara", expl: "Meaning ready for battle; starting the year strong." },
-    { name: "Esperanza", expl: "Bringing in hope for the new year." },
-    { name: "Mango Moon", expl: "A sweet, sunny January vibe." },
-    { name: "Orchid Moon", expl: "Blooming into the year." }
-  ],
-  "February": [
-    { name: "Corazón Moon", expl: "A month of hearts and heat." },
-    { name: "Guava Moon", expl: "Pink and fragrant." },
-    { name: "Candle Moon", expl: "Small lights in short nights." },
-    { name: "Biscayne Moon", expl: "Bay breeze energy." }
-  ],
-  "March": [
-    { name: "Mangrove Moon", expl: "Rooted, brackish, alive." },
-    { name: "Heron Moon", expl: "Long-legged patience." },
-    { name: "Spring Moon", expl: "Seasonal classic." },
-    { name: "Crocus Moon", expl: "Early bloom." }
-  ],
-  "April": [
-    { name: "Rain Moon", expl: "Cloudbursts and bright streets." },
-    { name: "Marisol", expl: "Mar y sol — sun + sea." },
-    { name: "Palm Moon", expl: "Wind through fronds." },
-    { name: "Jasmine Moon", expl: "Sweet night air." }
-  ],
-  "May": [
-    { name: "Marisol", expl: "Sunny showers, Miami-style." },
-    { name: "Garden Moon", expl: "Everything growing." },
-    { name: "Storm Moon", expl: "Heat lightning season." },
-    { name: "Bougainvillea Moon", expl: "Color everywhere." }
-  ],
-  "June": [
-    { name: "Mango Moon", expl: "June is mango season!" },
-    { name: "Niurka", expl: "Meaning the light; summer sun after May showers." },
-    { name: "Solstice Moon", expl: "Longest days." },
-    { name: "Heat Moon", expl: "The air gets thick." }
-  ],
-  "July": [
-    { name: "Firework Moon", expl: "Loud skies." },
-    { name: "Ocean Moon", expl: "Salt and sweat." },
-    { name: "Thunder Moon", expl: "Afternoon storms." },
-    { name: "Coconut Moon", expl: "Tropical peak." }
-  ],
-  "August": [
-    { name: "Agustina", expl: "Feminized August; abuelita energy." },
-    { name: "Sunburn Moon", expl: "Late-summer bite." },
-    { name: "Hurricane Moon", expl: "Storm watch." },
-    { name: "Sand Moon", expl: "Hot ground." },
-  ],
-  "September": [
-    { name: "Equinox Moon", expl: "Light starts to turn." },
-    { name: "Back-to-School Moon", expl: "A reset." },
-    { name: "Banyan Moon", expl: "Wide shade." },
-    { name: "Café Moon", expl: "Evenings soften." }
-  ],
-  "October": [
-    { name: "Harvest Moon", expl: "Classic." },
-    { name: "Spooky Moon", expl: "Costumes and shadows." },
-    { name: "Pumpkin Moon", expl: "Orange season." },
-    { name: "Front Moon", expl: "First cold front tease." }
-  ],
-  "November": [
-    { name: "Ofelia", expl: "Oranges and browns; elegant abuelita vibes." },
-    { name: "Manatee Moon", expl: "Cooler water, gentle giants." },
-    { name: "Darryl", expl: "A November Darryl." },
-    { name: "Moon", expl: "Simple and direct." }
-  ],
-  "December": [
-    { name: "Lazara", expl: "San Lázaro; God helped us get to December." },
-    { name: "Noël Moon", expl: "Holiday glow." },
-    { name: "Frost Moon", expl: "A rare chill." },
-    { name: "Midnight Moon", expl: "Longest nights." }
-  ],
-  "Blue Moon": [
-    { name: "Blue Moon", expl: "The extra one." },
-    { name: "Second Moon", expl: "A bonus round." },
-    { name: "Afterparty Moon", expl: "One more dance." },
-    { name: "Wild Card Moon", expl: "Anything can happen." }
-  ]
-};
-
-// --- Elements ---
-const stepIdentity = document.getElementById("stepIdentity");
-const stepVoting   = document.getElementById("stepVoting");
-const nameEl   = document.getElementById("name");
-const emailEl  = document.getElementById("email");
-const beginBtn = document.getElementById("beginBtn");
-const identityErr = document.getElementById("identityErr");
-
-const monthTitle = document.getElementById("monthTitle");
-const progressEl = document.getElementById("progress");
-const whoEl = document.getElementById("who");
-const optionsEl = document.getElementById("options");
-
-const backBtn = document.getElementById("backBtn");
-const nextBtn = document.getElementById("nextBtn");
-const submitBtn = document.getElementById("submitBtn");
-const reviewBtn = document.getElementById("reviewBtn");
-
-const statusEl = document.getElementById("status");
-const voteErrEl = document.getElementById("voteErr");
-
-// --- State ---
-let voter = {
-  name: sessionStorage.getItem("moonVote_name") || "",
-  email: sessionStorage.getItem("moonVote_email") || ""
-};
-
-let selections = JSON.parse(sessionStorage.getItem("moonVote_selections") || "{}");
-let idx = Number(sessionStorage.getItem("moonVote_idx") || "0");
-
-function saveState() {
-  sessionStorage.setItem("moonVote_name", voter.name);
-  sessionStorage.setItem("moonVote_email", voter.email);
-  sessionStorage.setItem("moonVote_selections", JSON.stringify(selections));
-  sessionStorage.setItem("moonVote_idx", String(idx));
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function showIdentity() {
-  stepIdentity.style.display = "";
-  stepVoting.style.display = "none";
-  nameEl.value = voter.name;
-  emailEl.value = voter.email;
-  identityErr.textContent = "";
-}
-
-function showVoting() {
-  stepIdentity.style.display = "none";
-  stepVoting.style.display = "";
-  whoEl.textContent = `${voter.name} • ${voter.email}`;
-  renderMonth();
-}
-
-function renderMonth() {
-  statusEl.textContent = "";
-  voteErrEl.textContent = "";
-
-  const month = MONTHS[idx];
-  monthTitle.textContent = month;
-  progressEl.textContent = `Month ${idx + 1} of ${MONTHS.length}`;
-
-  backBtn.disabled = idx === 0;
-  nextBtn.disabled = idx === MONTHS.length - 1;
-
-  const opts = NOMINEES[month] || [];
-  optionsEl.innerHTML = "";
-
-  const selected = selections[month] || "";
-
-  opts.forEach(opt => {
-    const card = document.createElement("div");
-    card.className = "moon-option" + (selected === opt.name ? " selected" : "");
-    card.setAttribute("role", "button");
-    card.setAttribute("tabindex", "0");
-    card.innerHTML = `
-      <div class="check">✓</div>
-      <h3 class="moon-optname">${escapeHtml(opt.name)}</h3>
-      <p class="moon-optexpl">${escapeHtml(opt.expl || "")}</p>
-    `;
-
-    const pick = () => {
-      selections[month] = opt.name;
-      saveState();
-      renderMonth();
+    // Replace with your real 4 finalists per month
+    const NOMINEES = {
+      "January": [
+        { name: "Xiomara", expl: "Meaning ready for battle; starting the year strong." },
+        { name: "Esperanza", expl: "Bringing in hope for the new year." },
+        { name: "Mango Moon", expl: "A sweet, sunny January vibe." },
+        { name: "Orchid Moon", expl: "Blooming into the year." }
+      ],
+      "February": [
+        { name: "Corazón Moon", expl: "A month of hearts and heat." },
+        { name: "Guava Moon", expl: "Pink and fragrant." },
+        { name: "Candle Moon", expl: "Small lights in short nights." },
+        { name: "Biscayne Moon", expl: "Bay breeze energy." }
+      ],
+      "March": [
+        { name: "Mangrove Moon", expl: "Rooted, brackish, alive." },
+        { name: "Heron Moon", expl: "Long-legged patience." },
+        { name: "Spring Moon", expl: "Seasonal classic." },
+        { name: "Crocus Moon", expl: "Early bloom." }
+      ],
+      "April": [
+        { name: "Rain Moon", expl: "Cloudbursts and bright streets." },
+        { name: "Marisol", expl: "Mar y sol — sun + sea." },
+        { name: "Palm Moon", expl: "Wind through fronds." },
+        { name: "Jasmine Moon", expl: "Sweet night air." }
+      ],
+      "May": [
+        { name: "Marisol", expl: "Sunny showers, Miami-style." },
+        { name: "Garden Moon", expl: "Everything growing." },
+        { name: "Storm Moon", expl: "Heat lightning season." },
+        { name: "Bougainvillea Moon", expl: "Color everywhere." }
+      ],
+      "June": [
+        { name: "Mango Moon", expl: "June is mango season!" },
+        { name: "Niurka", expl: "Meaning the light; summer sun after May showers." },
+        { name: "Solstice Moon", expl: "Longest days." },
+        { name: "Heat Moon", expl: "The air gets thick." }
+      ],
+      "July": [
+        { name: "Firework Moon", expl: "Loud skies." },
+        { name: "Ocean Moon", expl: "Salt and sweat." },
+        { name: "Thunder Moon", expl: "Afternoon storms." },
+        { name: "Coconut Moon", expl: "Tropical peak." }
+      ],
+      "August": [
+        { name: "Agustina", expl: "Feminized August; abuelita energy." },
+        { name: "Sunburn Moon", expl: "Late-summer bite." },
+        { name: "Hurricane Moon", expl: "Storm watch." },
+        { name: "Sand Moon", expl: "Hot ground." }
+      ],
+      "September": [
+        { name: "Equinox Moon", expl: "Light starts to turn." },
+        { name: "Back-to-School Moon", expl: "A reset." },
+        { name: "Banyan Moon", expl: "Wide shade." },
+        { name: "Café Moon", expl: "Evenings soften." }
+      ],
+      "October": [
+        { name: "Harvest Moon", expl: "Classic." },
+        { name: "Spooky Moon", expl: "Costumes and shadows." },
+        { name: "Pumpkin Moon", expl: "Orange season." },
+        { name: "Front Moon", expl: "First cold front tease." }
+      ],
+      "November": [
+        { name: "Ofelia", expl: "Oranges and browns; elegant abuelita vibes." },
+        { name: "Manatee Moon", expl: "Cooler water, gentle giants." },
+        { name: "Darryl", expl: "A November Darryl." },
+        { name: "Moon", expl: "Simple and direct." }
+      ],
+      "December": [
+        { name: "Lazara", expl: "San Lázaro; God helped us get to December." },
+        { name: "Noël Moon", expl: "Holiday glow." },
+        { name: "Frost Moon", expl: "A rare chill." },
+        { name: "Midnight Moon", expl: "Longest nights." }
+      ],
+      "Blue Moon": [
+        { name: "Blue Moon", expl: "The extra one." },
+        { name: "Second Moon", expl: "A bonus round." },
+        { name: "Afterparty Moon", expl: "One more dance." },
+        { name: "Wild Card Moon", expl: "Anything can happen." }
+      ]
     };
 
-    card.addEventListener("click", pick);
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") pick();
+    // ====== STATE (persist across refresh) ======
+    let voter = {
+      name: sessionStorage.getItem("moonVote_name") || "",
+      email: sessionStorage.getItem("moonVote_email") || ""
+    };
+    let selections = JSON.parse(sessionStorage.getItem("moonVote_selections") || "{}");
+    let idx = Number(sessionStorage.getItem("moonVote_idx") || "0");
+
+    function saveState(){
+      sessionStorage.setItem("moonVote_name", voter.name);
+      sessionStorage.setItem("moonVote_email", voter.email);
+      sessionStorage.setItem("moonVote_selections", JSON.stringify(selections));
+      sessionStorage.setItem("moonVote_idx", String(idx));
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ====== ELEMENTS ======
+    const stepIdentity = document.getElementById("stepIdentity");
+    const stepVoting   = document.getElementById("stepVoting");
+
+    const nameEl = document.getElementById("name");
+    const emailEl = document.getElementById("email");
+    const beginBtn = document.getElementById("beginBtn");
+    const identityErr = document.getElementById("identityErr");
+
+    const monthTitle = document.getElementById("monthTitle");
+    const progressEl = document.getElementById("progress");
+    const whoEl = document.getElementById("who");
+    const optionsEl = document.getElementById("options");
+
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const reviewBtn = document.getElementById("reviewBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const statusEl = document.getElementById("status");
+    const voteErrEl = document.getElementById("voteErr");
+
+    // ====== UI ======
+    function showIdentity(){
+      stepIdentity.style.display = "";
+      stepVoting.style.display = "none";
+      nameEl.value = voter.name;
+      emailEl.value = voter.email;
+      identityErr.textContent = "";
+    }
+
+    function showVoting(){
+      stepIdentity.style.display = "none";
+      stepVoting.style.display = "";
+      whoEl.textContent = `${voter.name} • ${voter.email}`;
+      renderMonth();
+    }
+
+    function renderMonth(){
+      statusEl.textContent = "";
+      voteErrEl.textContent = "";
+
+      const month = MONTHS[idx];
+      monthTitle.textContent = month;
+      progressEl.textContent = `Month ${idx + 1} of ${MONTHS.length}`;
+
+      backBtn.disabled = idx === 0;
+      nextBtn.disabled = idx === MONTHS.length - 1;
+
+      const opts = NOMINEES[month] || [];
+      const selected = selections[month] || "";
+
+      optionsEl.innerHTML = "";
+
+      opts.forEach(opt => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "option" + (selected === opt.name ? " selected" : "");
+        card.innerHTML = `
+          <span class="check" aria-hidden="true">✓</span>
+          <div class="opt-name">${escapeHtml(opt.name)}</div>
+          <div class="opt-expl">${escapeHtml(opt.expl || "")}</div>
+        `;
+        card.addEventListener("click", () => {
+          selections[month] = opt.name;
+          saveState();
+          renderMonth();
+        });
+        optionsEl.appendChild(card);
+      });
+
+      saveState();
+    }
+
+    // ====== EVENTS ======
+    beginBtn.addEventListener("click", () => {
+      identityErr.textContent = "";
+      const name = nameEl.value.trim();
+      const email = emailEl.value.trim().toLowerCase();
+
+      if (!name || !email) {
+        identityErr.textContent = "Please enter both name and email.";
+        return;
+      }
+      if (!email.includes("@")) {
+        identityErr.textContent = "Please enter a valid email.";
+        return;
+      }
+
+      voter = { name, email };
+      saveState();
+      showVoting();
     });
 
-    optionsEl.appendChild(card);
-  });
-
-  saveState();
-}
-
-beginBtn.addEventListener("click", () => {
-  identityErr.textContent = "";
-  const name = nameEl.value.trim();
-  const email = emailEl.value.trim().toLowerCase();
-
-  if (!name || !email) {
-    identityErr.textContent = "Please enter both name and email.";
-    return;
-  }
-  if (!email.includes("@")) {
-    identityErr.textContent = "Please enter a valid email.";
-    return;
-  }
-
-  voter = { name, email };
-  saveState();
-  showVoting();
-});
-
-backBtn.addEventListener("click", () => {
-  if (idx > 0) idx--;
-  saveState();
-  renderMonth();
-});
-
-nextBtn.addEventListener("click", () => {
-  if (idx < MONTHS.length - 1) idx++;
-  saveState();
-  renderMonth();
-});
-
-reviewBtn.addEventListener("click", () => {
-  const lines = MONTHS.map(m => `${m}: ${selections[m] ? selections[m] : "—"}`);
-  alert(lines.join("\n"));
-});
-
-submitBtn.addEventListener("click", async () => {
-  voteErrEl.textContent = "";
-  statusEl.textContent = "";
-
-  const missing = MONTHS.filter(m => !selections[m]);
-  if (missing.length) {
-    voteErrEl.textContent = `Please vote for: ${missing.join(", ")}`;
-    return;
-  }
-
-  statusEl.textContent = "Submitting…";
-
-  const payload = {
-    name: voter.name,
-    email: voter.email,
-    selections,
-    user_agent: navigator.userAgent
-  };
-
-  try {
-    // Web Apps often don't include CORS headers; mode:no-cors still records successfully.
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
+    backBtn.addEventListener("click", () => {
+      if (idx > 0) idx--;
+      saveState();
+      renderMonth();
     });
 
-    statusEl.textContent = "Submitted. Thank you!";
-    // optional: freeze UI after submit
-    submitBtn.disabled = true;
-    backBtn.disabled = true;
-    nextBtn.disabled = true;
-    reviewBtn.disabled = true;
-  } catch (e) {
-    statusEl.textContent = "";
-    voteErrEl.textContent = "Submit failed. Please try again.";
-  }
-});
+    nextBtn.addEventListener("click", () => {
+      if (idx < MONTHS.length - 1) idx++;
+      saveState();
+      renderMonth();
+    });
 
-// Boot
-if (voter.name && voter.email) showVoting();
-else showIdentity();
-</script>
+    reviewBtn.addEventListener("click", () => {
+      const lines = MONTHS.map(m => `${m}: ${selections[m] ? selections[m] : "—"}`);
+      alert(lines.join("\n"));
+    });
+
+    submitBtn.addEventListener("click", async () => {
+      voteErrEl.textContent = "";
+      statusEl.textContent = "";
+
+      const missing = MONTHS.filter(m => !selections[m]);
+      if (missing.length) {
+        voteErrEl.textContent = `Please vote for: ${missing.join(", ")}`;
+        return;
+      }
+
+      statusEl.textContent = "Submitting…";
+
+      const payload = {
+        name: voter.name,
+        email: voter.email,
+        selections,
+        user_agent: navigator.userAgent
+      };
+
+      try {
+        // Apps Script often lacks CORS headers; no-cors still records successfully.
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        statusEl.textContent = "Submitted. Thank you!";
+        submitBtn.disabled = true;
+        backBtn.disabled = true;
+        nextBtn.disabled = true;
+        reviewBtn.disabled = true;
+      } catch (e) {
+        statusEl.textContent = "";
+        voteErrEl.textContent = "Submit failed. Please try again.";
+      }
+    });
+
+    // Boot
+    if (voter.name && voter.email) showVoting();
+    else showIdentity();
+  </script>
 </body>
 </html>
