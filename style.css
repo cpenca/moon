@@ -398,3 +398,66 @@ a:hover{ color: rgba(255,255,255,1); }
 .msg{ margin: 12px 0 0; color: var(--ink-soft); }
 .msg-error{ color: rgba(255,150,150,0.98); }
 
+/* EVENT CARD */
+
+.event-card{
+  margin-top: 60px;
+  padding: 36px;
+  border-radius: 24px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,.10),
+    rgba(255,255,255,.05)
+  );
+
+  border: 2px solid rgba(255,255,255,.35);
+  box-shadow: 0 20px 40px rgba(0,0,0,.25);
+}
+
+.event-content{
+  max-width: 620px;
+}
+
+.event-eyebrow{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+
+.event-title{
+  font-size: clamp(28px,3vw,38px);
+  margin-bottom: 12px;
+}
+
+.event-details{
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--ink-soft);
+}
+
+.event-button{
+  display: inline-block;
+  margin-top: 8px;
+
+  padding: 12px 22px;
+
+  border-radius: 999px;
+  border: 2px solid white;
+
+  text-decoration: none;
+  font-weight: 600;
+
+  color: white;
+  background: rgba(255,255,255,.1);
+
+  transition: all .2s ease;
+}
+
+.event-button:hover{
+  background: white;
+  color: black;
+}
+
